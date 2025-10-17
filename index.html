@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoGenius - 文字变视频，创意无极限</title>
+    <!-- 引入外部资源 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义主题 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1', // 主色调：靛蓝色，传达创新和技术感
+                        secondary: '#ec4899', // 辅助色：粉红色，用于强调和交互元素
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Montserrat', 'sans-serif']
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .gradient-overlay {
+                background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(236, 72, 153, 0.8));
+            }
+            .glass-effect {
+                backdrop-filter: blur(10px);
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+        }
+    </style>
+    
+    <style>
+        /* 全局动画定义 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 3s infinite ease-in-out;
+        }
+        
+        .animate-float {
+            animation: float 6s infinite ease-in-out;
+        }
+        
+        /* 加载动画 */
+        .loader {
+            border-top-color: #6366f1;
+            animation: spinner 0.8s linear infinite;
+        }
+        
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* 视频卡片悬停效果 */
+        .video-card {
+            transition: all 0.3s ease;
+        }
+        
+        .video-card:hover {
+            transform: translateY(-8px);
+        }
+
+        /* 模态框动画 */
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        .modal-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 300ms, transform 300ms;
+        }
+        .modal-exit {
+            opacity: 1;
+        }
+        .modal-exit-active {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 300ms, transform 300ms;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- 导航栏 -->
+    <header id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300">
+        <div class="glass-effect border-b border-white/10">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <!-- Logo -->
+                    <a href="#" class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-lg gradient-overlay flex items-center justify-center">
+                            <i class="fa fa-play-circle text-white text-xl"></i>
+                        </div>
+                        <span class="text-xl font-display font-bold text-white" data-i18n="brand">VideoGenius</span>
+                    </a>
+                    
+                    <!-- 导航链接 - 桌面版 -->
+                    <nav class="hidden md:flex items-center space-x-8">
+                        <a href="#features" class="text-white hover:text-primary/80 transition-colors" data-i18n="features">功能</a>
+                        <a href="#examples" class="text-white hover:text-primary/80 transition-colors" data-i18n="examples">示例</a>
+                        <a href="#pricing" class="text-white hover:text-primary/80 transition-colors" data-i18n="pricing">价格</a>
+                        <a href="#faq" class="text-white hover:text-primary/80 transition-colors" data-i18n="faq">常见问题</a>
+                    </nav>
+                    
+                    <!-- 右侧操作区 -->
+                    <div class="flex items-center space-x-4">
+                        <!-- 语言选择器 -->
+                        <div class="relative group">
+                            <button class="flex items-center space-x-1 text-white hover:text-primary/80 transition-colors">
+                                <i class="fa fa-globe"></i>
+                                <span id="current-lang">中文</span>
+                                <i class="fa fa-chevron-down text-xs"></i>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-36 rounded-md shadow-lg glass-effect border border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                <div class="py-1">
+                                    <a href="#" class="lang-option block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-lang="zh">中文</a>
+                                    <a href="#" class="lang-option block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-lang="en">English</a>
+                                    <a href="#" class="lang-option block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-lang="ja">日本語</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 用户菜单 -->
+                        <div class="relative group">
+                            <button id="user-menu-button" class="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+                                <i class="fa fa-user text-white"></i>
+                            </button>
+                            <div id="user-menu" class="absolute right-0 mt-2 w-48 rounded-md shadow-lg glass-effect border border-white/10 opacity-0 invisible transition-all duration-200 z-50">
+                                <div class="py-1">
+                                    <a href="/login.html" id="login-link" class="block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-i18n="login">登录</a>
+                                    <a href="/register.html" id="register-link" class="block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-i18n="register">注册</a>
+                                    <div id="user-logged-in" class="hidden">
+                                        <a href="#" class="block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-i18n="profile">个人资料</a>
+                                        <a href="#" class="block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-i18n="my-videos">我的视频</a>
+                                        <a href="#" id="logout-link" class="block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-i18n="logout">退出</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 移动端菜单按钮 -->
+                        <button id="mobile-menu-button" class="md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+                            <i class="fa fa-bars text-white"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="md:hidden glass-effect border-b border-white/10 hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#features" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-primary/20 transition-colors" data-i18n="features">功能</a>
+                <a href="#examples" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-primary/20 transition-colors" data-i18n="examples">示例</a>
+                <a href="#pricing" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-primary/20 transition-colors" data-i18n="pricing">价格</a>
+                <a href="#faq" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-primary/20 transition-colors" data-i18n="faq">常见问题</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="relative min-h-screen pt-24 pb-16 flex items-center overflow-hidden">
+        <!-- 背景效果 -->
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-br from-dark via-gray-900 to-dark opacity-90"></div>
+            <div class="absolute inset-0 bg-[url('https://picsum.photos/id/1/1920/1080')] bg-cover bg-center opacity-20"></div>
+            <!-- 装饰性图形 -->
+            <div class="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-primary/20 blur-3xl animate-pulse-slow"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-secondary/20 blur-3xl animate-pulse-slow" style="animation-delay: 1s;"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="max-w-4xl mx-auto text-center">
+                <h1 class="text-[clamp(2.5rem,6vw,4rem)] font-display font-bold text-white leading-tight text-shadow animate-fade-in" style="animation-delay: 0.1s;" data-i18n="hero.title">
+                    文字变视频，<br class="md:hidden">创意无极限
+                </h1>
+                <p class="mt-6 text-[clamp(1rem,2vw,1.25rem)] text-gray-200 max-w-2xl mx-auto animate-fade-in" style="animation-delay: 0.3s;" data-i18n="hero.subtitle">
+                    只需输入文字描述，我们的AI就能生成高质量视频，让您的创意轻松变为现实。无需专业技能，人人都能成为视频创作者。
+                </p>
+                
+                <!-- 文本输入区域 -->
+                <div class="mt-10 bg-white/10 rounded-2xl p-4 shadow-xl border border-white/10 animate-fade-in" style="animation-delay: 0.5s;">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <textarea 
+                            id="video-prompt" 
+                            class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                            rows="3"
+                            placeholder="描述您想要生成的视频..."
+                            data-i18n-placeholder="prompt.placeholder"
+                        ></textarea>
+                        <div class="flex flex-col gap-3 w-full md:w-auto">
+                            <select id="video-style" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="realistic" data-i18n="styles.realistic">写实风格</option>
+                                <option value="cartoon" data-i18n="styles.cartoon">卡通风格</option>
+                                <option value="anime" data-i18n="styles.anime">动漫风格</option>
+                                <option value="abstract" data-i18n="styles.abstract">抽象风格</option>
+                            </select>
+                            <select id="video-duration" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="10" data-i18n="durations.10s">10秒</option>
+                                <option value="30" data-i18n="durations.30s">30秒</option>
+                                <option value="60" data-i18n="durations.60s">60秒</option>
+                                <option value="120" data-i18n="durations.120s">120秒</option>
+                            </select>
+                            <button id="generate-button" class="gradient-overlay hover:opacity-90 text-white font-medium py-3 px-6 rounded-xl transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-900 flex items-center justify-center gap-2">
+                                <i class="fa fa-magic"></i>
+                                <span data-i18n="generate">生成视频</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 生成状态和结果 -->
+                    <div id="generation-status" class="mt-4 hidden">
+                        <div class="flex items-center justify-center gap-3 py-4">
+                            <div class="w-8 h-8 border-4 border-white/20 rounded-full loader"></div>
+                            <p class="text-white" data-i18n="generating">正在生成视频，请稍候...</p>
+                        </div>
+                    </div>
+                    
+                    <div id="generation-result" class="mt-4 hidden">
+                        <div class="rounded-xl overflow-hidden border border-white/10">
+                            <video id="generated-video" controls class="w-full h-auto">
+                                <source src="" type="video/mp4">
+                                <data-i18n="video-not-supported">您的浏览器不支持视频播放</data-i18n>
+                            </video>
+                        </div>
+                        <div class="mt-3 flex flex-wrap gap-2 justify-center">
+                            <button class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-1">
+                                <i class="fa fa-download"></i>
+                                <span data-i18n="download">下载</span>
+                            </button>
+                            <button class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-1">
+                                <i class="fa fa-share-alt"></i>
+                                <span data-i18n="share">分享</span>
+                            </button>
+                            <button class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-1">
+                                <i class="fa fa-refresh"></i>
+                                <span data-i18n="regenerate">重新生成</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 提示信息 -->
+                <p class="mt-4 text-sm text-gray-400 animate-fade-in" style="animation-delay: 0.7s;" data-i18n="free-prompt">
+                    免费用户每天可生成3个视频，注册后可获得更多额度
+                </p>
+            </div>
+            
+            <!-- 滚动提示 -->
+            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/70 animate-bounce">
+                <i class="fa fa-chevron-down"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能特点 -->
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-display font-bold text-dark" data-i18n="features.title">强大功能，简单操作</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto" data-i18n="features.subtitle">
+                    我们的文生视频平台集成了最先进的AI技术，让视频创作变得前所未有的简单高效
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 功能卡片1 -->
+                <div class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
+                    <div class="w-14 h-14 rounded-xl gradient-overlay flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa fa-magic text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-3" data-i18n="features.card1.title">智能文本解析</h3>
+                    <p class="text-gray-600" data-i18n="features.card1.desc">
+                        先进的自然语言处理技术，能够精准理解您的文本描述，捕捉细微的情感和场景细节。
+                    </p>
+                </div>
+                
+                <!-- 功能卡片2 -->
+                <div class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
+                    <div class="w-14 h-14 rounded-xl gradient-overlay flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa fa-paint-brush text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-3" data-i18n="features.card2.title">多种艺术风格</h3>
+                    <p class="text-gray-600" data-i18n="features.card2.desc">
+                        支持写实、卡通、动漫、抽象等多种艺术风格，满足不同场景和创意需求。
+                    </p>
+                </div>
+                
+                <!-- 功能卡片3 -->
+                <div class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
+                    <div class="w-14 h-14 rounded-xl gradient-overlay flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa fa-music text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-3" data-i18n="features.card3.title">智能配乐</h3>
+                    <p class="text-gray-600" data-i18n="features.card3.desc">
+                        根据视频内容和情感自动匹配合适的背景音乐，增强视频的表现力和感染力。
+                    </p>
+                </div>
+                
+                <!-- 功能卡片4 -->
+                <div class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
+                    <div class="w-14 h-14 rounded-xl gradient-overlay flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa fa-sliders text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-3" data-i18n="features.card4.title">灵活编辑</h3>
+                    <p class="text-gray-600" data-i18n="features.card4.desc">
+                        提供简单直观的编辑工具，可调整视频长度、场景转换、语速等参数，实现个性化定制。
+                    </p>
+                </div>
+                
+                <!-- 功能卡片5 -->
+                <div class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
+                    <div class="w-14 h-14 rounded-xl gradient-overlay flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa fa-cloud-upload text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-3" data-i18n="features.card5.title">云端存储</h3>
+                    <p class="text-gray-600" data-i18n="features.card5.desc">
+                        自动保存您的创作到云端，随时随地访问和管理您的视频作品，永不丢失。
+                    </p>
+                </div>
+                
+                <!-- 功能卡片6 -->
+                <div class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
+                    <div class="w-14 h-14 rounded-xl gradient-overlay flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa fa-share-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-3" data-i18n="features.card6.title">一键分享</h3>
+                    <p class="text-gray-600" data-i18n="features.card6.desc">
+                        支持直接分享到各大社交平台和视频网站，让您的作品快速触达更多观众。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 示例展示 -->
+    <section id="examples" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-display font-bold text-dark" data-i18n="examples.title">精彩示例</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto" data-i18n="examples.subtitle">
+                    看看其他用户如何通过简单的文字描述，生成令人惊叹的视频作品
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 示例1 -->
+                <div class="video-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/96/600/400" alt="夕阳下的山脉和湖泊" class="w-full h-48 object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 hover:opacity-100 transition-opacity">
+                            <button class="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white">
+                                <i class="fa fa-play text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
+                            0:15
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-dark mb-2" data-i18n="examples.example1.title">山间日落</h3>
+                        <p class="text-gray-600 text-sm mb-4" data-i18n="examples.example1.prompt">
+                            提示词: 壮观的日落时分，金色的阳光洒在连绵的山脉和宁静的湖面上，几只飞鸟掠过水面
+                        </p>
+                        <div class="flex items-center text-xs text-gray-500">
+                            <span class="flex items-center"><i class="fa fa-user-circle mr-1"></i> user873</span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center"><i class="fa fa-eye mr-1"></i> 1.2k</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 示例2 -->
+                <div class="video-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/111/600/400" alt="卡通风格的太空旅行" class="w-full h-48 object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 hover:opacity-100 transition-opacity">
+                            <button class="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white">
+                                <i class="fa fa-play text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
+                            0:30
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-dark mb-2" data-i18n="examples.example2.title">太空冒险</h3>
+                        <p class="text-gray-600 text-sm mb-4" data-i18n="examples.example2.prompt">
+                            提示词: 卡通风格，一个宇航员在太空中漂浮，周围是行星和闪烁的星星，远处有一个巨大的黑洞
+                        </p>
+                        <div class="flex items-center text-xs text-gray-500">
+                            <span class="flex items-center"><i class="fa fa-user-circle mr-1"></i> cosmic_art</span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center"><i class="fa fa-eye mr-1"></i> 3.5k</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 示例3 -->
+                <div class="video-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/237/600/400" alt="动漫风格的小狗玩耍" class="w-full h-48 object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 hover:opacity-100 transition-opacity">
+                            <button class="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white">
+                                <i class="fa fa-play text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
+                            0:20
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-dark mb-2" data-i18n="examples.example3.title">快乐小狗</h3>
+                        <p class="text-gray-600 text-sm mb-4" data-i18n="examples.example3.prompt">
+                            提示词: 动漫风格，一只可爱的金毛小狗在草地上追逐蝴蝶，阳光明媚，背景有鲜花和树木
+                        </p>
+                        <div class="flex items-center text-xs text-gray-500">
+                            <span class="flex items-center"><i class="fa fa-user-circle mr-1"></i> anime_lover</span>
+                            <span class="mx-2">•</span>
+                            <span class="flex items-center"><i class="fa fa-eye mr-1"></i> 2.8k</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 text-center">
+                <button class="bg-white border border-primary text-primary hover:bg-primary hover:text-white font-medium py-3 px-8 rounded-xl transition-colors flex items-center gap-2 mx-auto">
+                    <span data-i18n="examples.more">查看更多示例</span>
+                    <i class="fa fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 价格方案 -->
+    <section id="pricing" class="py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-display font-bold text-dark" data-i18n="pricing.title">选择适合您的方案</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto" data-i18n="pricing.subtitle">
+                    无论您是个人爱好者还是企业用户，我们都有满足您需求的方案
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- 免费方案 -->
+                <div class="bg-gray-50 rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-dark mb-2" data-i18n="pricing.free.title">免费版</h3>
+                        <div class="flex items-end mb-6">
+                            <span class="text-4xl font-bold text-dark">¥0</span>
+                            <span class="text-gray-500 ml-2 mb-1" data-i18n="pricing.per-month">/月</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-6" data-i18n="pricing.free.desc">
+                            适合初次体验的用户，探索AI视频生成的魅力
+                        </p>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-start">
+                                <i class="fa fa-check text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600 text-sm" data-i18n="pricing.free.features.1">每天3个视频生成额度</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-check text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600 text-sm" data-i18n="pricing.free.features.2">最长10秒视频</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-check text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600 text-sm" data-i18n="pricing.free.features.3">标清画质 (480p)</span>
+                            </li>
+                            <li class="flex items-start text-gray-400">
+                                <i class="fa fa-times mt-1 mr-3"></i>
+                                <span class="text-sm" data-i18n="pricing.free.features.4">无自定义配乐</span>
+                            </li>
+                            <li class="flex items-start text-gray-400">
+                                <i class="fa fa-times mt-1 mr-3"></i>
+                                <span class="text-sm" data-i18n="pricing.free.features.5">无优先处理</span>
+                            </li>
+                        </ul>
+                        <button class="w-full bg-white border border-primary text-primary hover:bg-primary/5 font-medium py-3 rounded-xl transition-colors" data-i18n="get-started">
+                            立即开始
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 进阶方案 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-xl border-2 border-primary relative transform scale-105 z-10">
+                    <div class="absolute top-0 right-0 bg-primary text-white text-xs font-bold px-4 py-1" data-i18n="pricing.popular">
+                        最受欢迎
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-dark mb-2" data-i18n="pricing.pro.title">进阶版</h3>
+                        <div class="flex items-end mb-6">
+                            <span class="text-4xl font-bold text-dark">¥39</span>
+                            <span class="text-gray-500 ml-2 mb-1" data-i18n="pricing.per-month">/月</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-6" data-i18n="pricing.pro.desc">
+                            适合个人创作者，满足日常视频制作需求
+                        </p>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-start">
+                                <i class="fa fa-check text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600 text-sm" data-i18n="pricing.pro.features.1">每天20个视频生成额度</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-check text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600 text-sm" data-i18n="pricing.pro.features.2">最长60秒视频</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-check text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600 text-sm" data-i18n="pricing.pro.features.3">高清画质 (720p)</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-check text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600 text-sm" data-i18n="pricing.pro.features.4">50种自定义配乐</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-check text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600 text-sm" data-i18n="pricing.pro.features.5">普通优先级处理</span>
+                            </li>
+                        </ul>
+                        <button class="w-full gradient-overlay hover:opacity-90 text-white font-medium py-3 rounded-xl transition-colors" data-i18n="pricing.choose">
+                            选择此方案
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 专业方案 -->
+                <div class="bg-gray-50 rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-dark mb-2" data-i18n="pricing.business.title">专业版</h3>
+                        <div class="flex items-end mb-6">
+                            <span class="text-4xl font-bold text-dark">¥99</span>
+                            <span class="text-gray-500 ml-2 mb-1" data-i18n="pricing.per-month">/月</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-6" data-i18n="pricing.business.desc">
+                            适合专业创作者和企业，满足高质量视频制作需求
+                        </p>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-start">
+                                <i class="fa fa-check text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600 text-sm" data-i18n="pricing.business.features.1">每天100个视频生成额度</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-check text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600 text-sm" data-i18n="pricing.business.features.2">最长3分钟视频</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-check text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600 text-sm" data-i18n="pricing.business.features.3">全高清画质 (1080p)</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-check text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600 text-sm" data-i18n="pricing.business.features.4">无限自定义配乐</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-check text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-600 text-sm" data-i18n="pricing.business.features.5">优先处理队列</span>
+                            </li>
+                        </ul>
+                        <button class="w-full bg-white border border-primary text-primary hover:bg-primary/5 font-medium py-3 rounded-xl transition-colors" data-i18n="pricing.choose">
+                            选择此方案
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 常见问题 -->
+    <section id="faq" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-display font-bold text-dark" data-i18n="faq.title">常见问题</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto" data-i18n="faq.subtitle">
+                    关于我们的文生视频平台，您可能想了解这些问题
+                </p>
+            </div>
+            
+            <div class="max-w-3xl mx-auto space-y-4">
+                <!-- FAQ 项目 1 -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <button class="faq-toggle w-full flex justify-between items-center p-5 text-left focus:outline-none">
+                        <span class="font-medium text-dark" data-i18n="faq.q1">生成一个视频需要多长时间？</span>
+                        <i class="fa fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <p class="text-gray-600" data-i18n="faq.a1">
+                            视频生成时间取决于视频长度、复杂度和当前系统负载，通常情况下，10秒的视频需要30秒到1分钟，60秒的视频需要2-3分钟。付费用户享有优先处理权，生成速度更快。
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- FAQ 项目 2 -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <button class="faq-toggle w-full flex justify-between items-center p-5 text-left focus:outline-none">
+                        <span class="font-medium text-dark" data-i18n="faq.q2">我可以使用生成的视频用于商业用途吗？</span>
+                        <i class="fa fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <p class="text-gray-600" data-i18n="faq.a2">
+                            是的，进阶版和专业版用户可以将生成的视频用于商业用途。免费用户生成的视频仅可用于非商业用途。所有用户需确保生成内容不侵犯第三方权益，不违反法律法规和公序良俗。
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- FAQ 项目 3 -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <button class="faq-toggle w-full flex justify-between items-center p-5 text-left focus:outline-none">
+                        <span class="font-medium text-dark" data-i18n="faq.q3">如何提高视频生成的质量？</span>
+                        <i class="fa fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <p class="text-gray-600" data-i18n="faq.a3">
+                            提供详细、具体的描述可以显著提高生成质量。建议包含场景、人物/物体、动作、风格、情绪等要素。例如，与其说"一只狗在跑"，不如说"一只棕色的拉布拉多犬在绿色的草地上快乐地奔跑，阳光明媚，背景有树木和蓝天"。
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- FAQ 项目 4 -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <button class="faq-toggle w-full flex justify-between items-center p-5 text-left focus:outline-none">
+                        <span class="font-medium text-dark" data-i18n="faq.q4">我可以编辑生成后的视频吗？</span>
+                        <i class="fa fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <p class="text-gray-600" data-i18n="faq.a4">
+                            是的，我们提供基础的视频编辑功能，包括剪辑、调整速度、添加文字和更换背景音乐等。进阶版和专业版用户还可以使用更高级的编辑工具，如添加转场效果、调整色彩和滤镜等。
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- FAQ 项目 5 -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <button class="faq-toggle w-full flex justify-between items-center p-5 text-left focus:outline-none">
+                        <span class="font-medium text-dark" data-i18n="faq.q5">如果我对生成的视频不满意怎么办？</span>
+                        <i class="fa fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-content hidden px-5 pb-5">
+                        <p class="text-gray-600" data-i18n="faq.a5">
+                            您可以使用"重新生成"功能再次尝试，建议调整您的描述以获得更好的结果。进阶版用户每月享有5次免费重新生成机会，专业版用户每月享有20次免费重新生成机会，超出次数将消耗您的日常额度。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 行动召唤 -->
+    <section class="py-20 bg-gradient-to-br from-primary/90 to-secondary/90 text-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-display font-bold mb-6" data-i18n="cta.title">
+                准备好开始您的视频创作之旅了吗？
+            </h2>
+            <p class="max-w-2xl mx-auto text-white/80 mb-10 text-lg" data-i18n="cta.subtitle">
+                加入我们，释放您的创意潜能，用文字创造令人惊叹的视频作品
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/register.html" id="cta-register" class="bg-white text-primary hover:bg-white/90 font-bold py-3 px-8 rounded-xl transition-colors transform hover:scale-105" data-i18n="cta.register">
+                    免费注册
+                </a>
+                <button class="bg-transparent border-2 border-white text-white hover:bg-white/10 font-bold py-3 px-8 rounded-xl transition-colors" data-i18n="cta.learn-more">
+                    了解更多
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white pt-16 pb-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <!-- 公司信息 -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-6">
+                        <div class="w-10 h-10 rounded-lg gradient-overlay flex items-center justify-center">
+                            <i class="fa fa-play-circle text-white text-xl"></i>
+                        </div>
+                        <span class="text-xl font-display font-bold text-white" data-i18n="brand">VideoGenius</span>
+                    </div>
+                    <p class="text-gray-400 mb-6" data-i18n="footer.desc">
+                        用AI技术将文字转化为精彩视频，让创意轻松实现
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
+                            <i class="fa fa-youtube-play"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 快速链接 -->
+                <div>
+                    <h3 class="text-lg font-bold mb-6" data-i18n="footer.links">快速链接</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#features" class="text-gray-400 hover:text-white transition-colors" data-i18n="features">功能</a></li>
+                        <li><a href="#examples" class="text-gray-400 hover:text-white transition-colors" data-i18n="examples">示例</a></li>
+                        <li><a href="#pricing" class="text-gray-400 hover:text-white transition-colors" data-i18n="pricing">价格</a></li>
+                        <li><a href="#faq" class="text-gray-400 hover:text-white transition-colors" data-i18n="faq">常见问题</a></li>
+                        <li><a href="/blog" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer.blog">博客</a></li>
+                    </ul>
+                </div>
+                
+                <!-- 支持 -->
+                <div>
+                    <h3 class="text-lg font-bold mb-6" data-i18n="footer.support">支持</h3>
+                    <ul class="space-y-3">
+                        <li><a href="/help-center" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer.help-center">帮助中心</a></li>
+                        <li><a href="/contact" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer.contact">联系我们</a></li>
+                        <li><a href="/status" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer.status">系统状态</a></li>
+                        <li><a href="/tutorials" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer.tutorials">教程</a></li>
+                    </ul>
+                </div>
+                
+                <!-- 法律 -->
+                <div>
+                    <h3 class="text-lg font-bold mb-6" data-i18n="footer.legal">法律</h3>
+                    <ul class="space-y-3">
+                        <li><a href="/terms" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer.terms">服务条款</a></li>
+                        <li><a href="/privacy" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer.privacy">隐私政策</a></li>
+                        <li><a href="/copyright" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer.copyright">版权声明</a></li>
+                        <li><a href="/acceptable-use" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer.acceptable-use">可接受使用政策</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-white/10 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-500 text-sm mb-4 md:mb-0" data-i18n="footer.copyright-text">
+                        © 2023 VideoGenius. 保留所有权利。
+                    </p>
+                    <div class="flex space-x-6">
+                        <a href="/terms" class="text-gray-500 hover:text-white text-sm transition-colors" data-i18n="footer.terms">服务条款</a>
+                        <a href="/privacy" class="text-gray-500 hover:text-white text-sm transition-colors" data-i18n="footer.privacy">隐私政策</a>
+                        <a href="/cookies" class="text-gray-500 hover:text-white text-sm transition-colors" data-i18n="footer.cookies">Cookie 政策</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 登录模态框 -->
+    <div id="login-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0" id="modal-content">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-dark" data-i18n="login">登录</h3>
+                    <button id="close-login-modal" class="text-gray-400 hover:text-gray-500">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <form id="login-form">
+                    <div class="mb-4">
+                        <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="email">邮箱</label>
+                        <input type="email" id="login-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" required>
+                    </div>
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-1">
+                            <label for="login-password" class="block text-sm font-medium text-gray-700" data-i18n="password">密码</label>
+                            <a href="#" class="text-sm text-primary hover:text-primary/80" data-i18n="forgot-password">忘记密码？</a>
+                        </div>
+                        <input type="password" id="login-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" required>
+                    </div>
+                    <button type="submit" class="w-full gradient-overlay hover:opacity-90 text-white font-medium py-3 rounded-xl transition-colors mb-4" data-i18n="login">
+                        登录
+                    </button>
+                    <div class="text-center text-sm text-gray-600 mb-4" data-i18n="or-login-with">
+                        或使用以下方式登录
+                    </div>
+                    <div class="flex space-x-3 mb-6">
+                        <button type="button" class="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 rounded-xl transition-colors">
+                            <i class="fa fa-google"></i>
+                            <span>Google</span>
+                        </button>
+                        <button type="button" class="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 rounded-xl transition-colors">
+                            <i class="fa fa-facebook"></i>
+                            <span>Facebook</span>
+                        </button>
+                    </div>
+                    <p class="text-center text-sm text-gray-600" data-i18n="no-account">
+                        还没有账号？ <a href="/register.html" class="text-primary hover:text-primary/80 font-medium">注册</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // 确保DOM完全加载后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 语言数据
+            const translations = {
+                zh: {
+                    brand: "VideoGenius",
+                    features: "功能",
+                    examples: "示例",
+                    pricing: "价格",
+                    faq: "常见问题",
+                    login: "登录",
+                    register: "注册",
+                    profile: "个人资料",
+                    "my-videos": "我的视频",
+                    logout: "退出",
+                    "hero.title": "文字变视频，<br class='md:hidden'>创意无极限",
+                    "hero.subtitle": "只需输入文字描述，我们的AI就能生成高质量视频，让您的创意轻松变为现实。无需专业技能，人人都能成为视频创作者。",
+                    "prompt.placeholder": "描述您想要生成的视频...",
+                    "styles.realistic": "写实风格",
+                    "styles.cartoon": "卡通风格",
+                    "styles.anime": "动漫风格",
+                    "styles.abstract": "抽象风格",
+                    "durations.10s": "10秒",
+                    "durations.30s": "30秒",
+                    "durations.60s": "60秒",
+                    "durations.120s": "120秒",
+                    generate: "生成视频",
+                    generating: "正在生成视频，请稍候...",
+                    "video-not-supported": "您的浏览器不支持视频播放",
+                    download: "下载",
+                    share: "分享",
+                    regenerate: "重新生成",
+                    "free-prompt": "免费用户每天可生成3个视频，注册后可获得更多额度",
+                    "features.title": "强大功能，简单操作",
+                    "features.subtitle": "我们的文生视频平台集成了最先进的AI技术，让视频创作变得前所未有的简单高效",
+                    "features.card1.title": "智能文本解析",
+                    "features.card1.desc": "先进的自然语言处理技术，能够精准理解您的文本描述，捕捉细微的情感和场景细节。",
+                    "features.card2.title": "多种艺术风格",
+                    "features.card2.desc": "支持写实、卡通、动漫、抽象等多种艺术风格，满足不同场景和创意需求。",
+                    "features.card3.title": "智能配乐",
+                    "features.card3.desc": "根据视频内容和情感自动匹配合适的背景音乐，增强视频的表现力和感染力。",
+                    "features.card4.title": "灵活编辑",
+                    "features.card4.desc": "提供简单直观的编辑工具，可调整视频长度、场景转换、语速等参数，实现个性化定制。",
+                    "features.card5.title": "云端存储",
+                    "features.card5.desc": "自动保存您的创作到云端，随时随地访问和管理您的视频作品，永不丢失。",
+                    "features.card6.title": "一键分享",
+                    "features.card6.desc": "支持直接分享到各大社交平台和视频网站，让您的作品快速触达更多观众。",
+                    "examples.title": "精彩示例",
+                    "examples.subtitle": "看看其他用户如何通过简单的文字描述，生成令人惊叹的视频作品",
+                    "examples.example1.title": "山间日落",
+                    "examples.example1.prompt": "提示词: 壮观的日落时分，金色的阳光洒在连绵的山脉和宁静的湖面上，几只飞鸟掠过水面",
+                    "examples.example2.title": "太空冒险",
+                    "examples.example2.prompt": "提示词: 卡通风格，一个宇航员在太空中漂浮，周围是行星和闪烁的星星，远处有一个巨大的黑洞",
+                    "examples.example3.title": "快乐小狗",
+                    "examples.example3.prompt": "提示词: 动漫风格，一只可爱的金毛小狗在草地上追逐蝴蝶，阳光明媚，背景有鲜花和树木",
+                    "examples.more": "查看更多示例",
+                    "pricing.title": "选择适合您的方案",
+                    "pricing.subtitle": "无论您是个人爱好者还是企业用户，我们都有满足您需求的方案",
+                    "pricing.per-month": "/月",
+                    "pricing.popular": "最受欢迎",
+                    "pricing.free.title": "免费版",
+                    "pricing.free.desc": "适合初次体验的用户，探索AI视频生成的魅力",
+                    "pricing.free.features.1": "每天3个视频生成额度",
+                    "pricing.free.features.2": "最长10秒视频",
+                    "pricing.free.features.3": "标清画质 (480p)",
+                    "pricing.free.features.4": "无自定义配乐",
+                    "pricing.free.features.5": "无优先处理",
+                    "pricing.pro.title": "进阶版",
+                    "pricing.pro.desc": "适合个人创作者，满足日常视频制作需求",
+                    "pricing.pro.features.1": "每天20个视频生成额度",
+                    "pricing.pro.features.2": "最长60秒视频",
+                    "pricing.pro.features.3": "高清画质 (720p)",
+                    "pricing.pro.features.4": "50种自定义配乐",
+                    "pricing.pro.features.5": "普通优先级处理",
+                    "pricing.business.title": "专业版",
+                    "pricing.business.desc": "适合专业创作者和企业，满足高质量视频制作需求",
+                    "pricing.business.features.1": "每天100个视频生成额度",
+                    "pricing.business.features.2": "最长3分钟视频",
+                    "pricing.business.features.3": "全高清画质 (1080p)",
+                    "pricing.business.features.4": "无限自定义配乐",
+                    "pricing.business.features.5": "优先处理队列",
+                    "get-started": "立即开始",
+                    "pricing.choose": "选择此方案",
+                    "faq.title": "常见问题",
+                    "faq.subtitle": "关于我们的文生视频平台，您可能想了解这些问题",
+                    "faq.q1": "生成一个视频需要多长时间？",
+                    "faq.a1": "视频生成时间取决于视频长度、复杂度和当前系统负载，通常情况下，10秒的视频需要30秒到1分钟，60秒的视频需要2-3分钟。付费用户享有优先处理权，生成速度更快。",
+                    "faq.q2": "我可以使用生成的视频用于商业用途吗？",
+                    "faq.a2": "是的，进阶版和专业版用户可以将生成的视频用于商业用途。免费用户生成的视频仅可用于非商业用途。所有用户需确保生成内容不侵犯第三方权益，不违反法律法规和公序良俗。",
+                    "faq.q3": "如何提高视频生成的质量？",
+                    "faq.a3": "提供详细、具体的描述可以显著提高生成质量。建议包含场景、人物/物体、动作、风格、情绪等要素。例如，与其说\"一只狗在跑\"，不如说\"一只棕色的拉布拉多犬在绿色的草地上快乐地奔跑，阳光明媚，背景有树木和蓝天\"。",
+                    "faq.q4": "我可以编辑生成后的视频吗？",
+                    "faq.a4": "是的，我们提供基础的视频编辑功能，包括剪辑、调整速度、添加文字和更换背景音乐等。进阶版和专业版用户还可以使用更高级的编辑工具，如添加转场效果、调整色彩和滤镜等。",
+                    "faq.q5": "如果我对生成的视频不满意怎么办？",
+                    "faq.a5": "您可以使用\"重新生成\"功能再次尝试，建议调整您的描述以获得更好的结果。进阶版用户每月享有5次免费重新生成机会，专业版用户每月享有20次免费重新生成机会，超出次数将消耗您的日常额度。",
+                    "cta.title": "准备好开始您的视频创作之旅了吗？",
+                    "cta.subtitle": "加入我们，释放您的创意潜能，用文字创造令人惊叹的视频作品",
+                    "cta.register": "免费注册",
+                    "cta.learn-more": "了解更多",
+                    "footer.desc": "用AI技术将文字转化为精彩视频，让创意轻松实现",
+                    "footer.links": "快速链接",
+                    "footer.blog": "博客",
+                    "footer.support": "支持",
+                    "footer.help-center": "帮助中心",
+                    "footer.contact": "联系我们",
+                    "footer.status": "系统状态",
+                    "footer.tutorials": "教程",
+                    "footer.legal": "法律",
+                    "footer.terms": "服务条款",
+                    "footer.privacy": "隐私政策",
+                    "footer.copyright": "版权声明",
+                    "footer.acceptable-use": "可接受使用政策",
+                    "footer.copyright-text": "© 2023 VideoGenius. 保留所有权利。",
+                    "footer.cookies": "Cookie 政策",
+                    "email": "邮箱",
+                    "password": "密码",
+                    "forgot-password": "忘记密码？",
+                    "or-login-with": "或使用以下方式登录",
+                    "no-account": "还没有账号？"
+                },
+                en: {
+                    // 英文翻译内容（省略，与之前相同）
+                },
+                ja: {
+                    // 日文翻译内容（省略，与之前相同）
+                }
+            };
+
+            // 导航栏滚动效果
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('bg-dark/90', 'backdrop-blur-md', 'shadow-md');
+                    navbar.classList.remove('bg-transparent');
+                } else {
+                    navbar.classList.remove('bg-dark/90', 'backdrop-blur-md', 'shadow-md');
+                    navbar.classList.add('bg-transparent');
+                }
+            });
+            
+            // 移动端菜单切换
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // 用户菜单切换
+            const userMenuButton = document.getElementById('user-menu-button');
+            const userMenu = document.getElementById('user-menu');
+            
+            userMenuButton.addEventListener('click', function() {
+                userMenu.classList.toggle('opacity-0');
+                userMenu.classList.toggle('invisible');
+            });
+            
+            // 点击其他地方关闭用户菜单
+            document.addEventListener('click', function(event) {
+                if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                    userMenu.classList.add('opacity-0', 'invisible');
+                }
+            });
+            
+            // FAQ 折叠功能
+            const faqToggles = document.querySelectorAll('.faq-toggle');
+            
+            faqToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('i');
+                    
+                    content.classList.toggle('hidden');
+                    icon.classList.toggle('rotate-180');
+                });
+            });
+            
+            // 语言切换功能
+            const langOptions = document.querySelectorAll('.lang-option');
+            const currentLangElement = document.getElementById('current-lang');
+            
+            langOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-lang');
+                    changeLanguage(lang);
+                    
+                    // 更新当前语言显示
+                    currentLangElement.textContent = this.textContent;
+                });
+            });
+            
+            // 生成视频按钮功能
+            const generateButton = document.getElementById('generate-button');
+            const generationStatus = document.getElementById('generation-status');
+            const generationResult = document.getElementById('generation-result');
+            const videoPrompt = document.getElementById('video-prompt');
+            
+            generateButton.addEventListener('click', function() {
+                if (!videoPrompt.value.trim()) {
+                    alert('请输入视频描述');
+                    return;
+                }
+                
+                // 显示生成状态
+                generationStatus.classList.remove('hidden');
+                generationResult.classList.add('hidden');
+                
+                // 模拟生成过程
+                setTimeout(function() {
+                    generationStatus.classList.add('hidden');
+                    generationResult.classList.remove('hidden');
+                    
+                    // 设置示例视频源
+                    document.getElementById('generated-video').src = 'https://storage.googleapis.com/web-dev-assets/video-and-source-tags/chrome.mp4';
+                }, 3000);
+            });
+            
+            // 登录模态框功能
+            const loginLink = document.getElementById('login-link');
+            const loginModal = document.getElementById('login-modal');
+            const closeLoginModal = document.getElementById('close-login-modal');
+            const modalContent = document.getElementById('modal-content');
+            
+            if (loginLink) {
+                loginLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openLoginModal();
+                });
+            }
+            
+            // 打开登录模态框
+            function openLoginModal() {
+                loginModal.classList.remove('hidden');
+                loginModal.classList.add('flex');
+                setTimeout(() => {
+                    modalContent.classList.remove('scale-95', 'opacity-0');
+                    modalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            }
+            
+            // 关闭登录模态框
+            function closeLoginModalFunc() {
+                modalContent.classList.remove('scale-100', 'opacity-100');
+                modalContent.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    loginModal.classList.remove('flex');
+                    loginModal.classList.add('hidden');
+                }, 300);
+            }
+            
+            if (closeLoginModal) {
+                closeLoginModal.addEventListener('click', closeLoginModalFunc);
+            }
+            
+            // 点击模态框外部关闭
+            if (loginModal) {
+                loginModal.addEventListener('click', function(e) {
+                    if (e.target === loginModal) {
+                        closeLoginModalFunc();
+                    }
+                });
+            }
+            
+            // 登录表单提交
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    // 模拟登录成功
+                    alert('登录成功！');
+                    closeLoginModalFunc();
+                    // 这里应该有实际的登录逻辑
+                    showLoggedInState();
+                });
+            }
+            
+            // 显示登录状态
+            function showLoggedInState() {
+                document.getElementById('login-link').classList.add('hidden');
+                document.getElementById('register-link').classList.add('hidden');
+                document.getElementById('user-logged-in').classList.remove('hidden');
+            }
+            
+            // 语言切换函数
+            function changeLanguage(lang) {
+                const elements = document.querySelectorAll('[data-i18n]');
+                elements.forEach(element => {
+                    const key = element.getAttribute('data-i18n');
+                    if (translations[lang] && translations[lang][key]) {
+                        element.textContent = translations[lang][key];
+                    }
+                });
+                
+                // 处理占位符
+                const placeholders = document.querySelectorAll('[data-i18n-placeholder]');
+                placeholders.forEach(element => {
+                    const key = element.getAttribute('data-i18n-placeholder');
+                    if (translations[lang] && translations[lang][key]) {
+                        element.placeholder = translations[lang][key];
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
