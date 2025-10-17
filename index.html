@@ -7,7 +7,7 @@
     <!-- 引入外部资源 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    
+
     <!-- 配置Tailwind自定义主题 -->
     <script>
         tailwind.config = {
@@ -27,7 +27,7 @@
             }
         }
     </script>
-    
+
     <!-- 自定义工具类 -->
     <style type="text/tailwindcss">
         @layer utilities {
@@ -46,57 +46,57 @@
             }
         }
     </style>
-    
+
     <style>
         /* 全局动画定义 */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
         }
-        
+
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
-        
+
         .animate-fade-in {
             animation: fadeIn 0.6s ease-out forwards;
         }
-        
+
         .animate-pulse-slow {
             animation: pulse 3s infinite ease-in-out;
         }
-        
+
         .animate-float {
             animation: float 6s infinite ease-in-out;
         }
-        
+
         /* 加载动画 */
         .loader {
             border-top-color: #6366f1;
             animation: spinner 0.8s linear infinite;
         }
-        
+
         @keyframes spinner {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
+
         /* 平滑滚动 */
         html {
             scroll-behavior: smooth;
         }
-        
+
         /* 视频卡片悬停效果 */
         .video-card {
             transition: all 0.3s ease;
         }
-        
+
         .video-card:hover {
             transform: translateY(-8px);
         }
@@ -123,8 +123,8 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
     <!-- 导航栏 -->
-    <header id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300">
-        <div class="glass-effect border-b border-white/10">
+    <header id="navbar" class="fixed w-full top-0 z-50 bg-dark/90 backdrop-blur-md shadow-md">
+        <div class="border-b border-white/10">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center py-4">
                     <!-- Logo -->
@@ -134,7 +134,7 @@
                         </div>
                         <span class="text-xl font-display font-bold text-white" data-i18n="brand">VideoGenius</span>
                     </a>
-                    
+
                     <!-- 导航链接 - 桌面版 -->
                     <nav class="hidden md:flex items-center space-x-8">
                         <a href="#features" class="text-white hover:text-primary/80 transition-colors" data-i18n="features">功能</a>
@@ -142,7 +142,7 @@
                         <a href="#pricing" class="text-white hover:text-primary/80 transition-colors" data-i18n="pricing">价格</a>
                         <a href="#faq" class="text-white hover:text-primary/80 transition-colors" data-i18n="faq">常见问题</a>
                     </nav>
-                    
+
                     <!-- 右侧操作区 -->
                     <div class="flex items-center space-x-4">
                         <!-- 语言选择器 -->
@@ -152,7 +152,7 @@
                                 <span id="current-lang">中文</span>
                                 <i class="fa fa-chevron-down text-xs"></i>
                             </button>
-                            <div class="absolute right-0 mt-2 w-36 rounded-md shadow-lg glass-effect border border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <div class="absolute right-0 mt-2 w-36 rounded-md shadow-lg bg-dark/90 backdrop-blur-md border border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                                 <div class="py-1">
                                     <a href="#" class="lang-option block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-lang="zh">中文</a>
                                     <a href="#" class="lang-option block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-lang="en">English</a>
@@ -160,13 +160,13 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- 用户菜单 -->
                         <div class="relative group">
                             <button id="user-menu-button" class="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
                                 <i class="fa fa-user text-white"></i>
                             </button>
-                            <div id="user-menu" class="absolute right-0 mt-2 w-48 rounded-md shadow-lg glass-effect border border-white/10 opacity-0 invisible transition-all duration-200 z-50">
+                            <div id="user-menu" class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-dark/90 backdrop-blur-md border border-white/10 opacity-0 invisible transition-all duration-200 z-50">
                                 <div class="py-1">
                                     <a href="#" id="login-link" class="block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-i18n="login">登录</a>
                                     <a href="#" id="register-link" class="block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-i18n="register">注册</a>
@@ -178,7 +178,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- 移动端菜单按钮 -->
                         <button id="mobile-menu-button" class="md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
                             <i class="fa fa-bars text-white"></i>
@@ -187,9 +187,9 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- 移动端菜单 -->
-        <div id="mobile-menu" class="md:hidden glass-effect border-b border-white/10 hidden">
+        <div id="mobile-menu" class="md:hidden bg-dark/90 backdrop-blur-md border-b border-white/10 hidden">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="#features" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-primary/20 transition-colors" data-i18n="features">功能</a>
                 <a href="#examples" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-primary/20 transition-colors" data-i18n="examples">示例</a>
@@ -209,7 +209,7 @@
             <div class="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-primary/20 blur-3xl animate-pulse-slow"></div>
             <div class="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-secondary/20 blur-3xl animate-pulse-slow" style="animation-delay: 1s;"></div>
         </div>
-        
+
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="max-w-4xl mx-auto text-center">
                 <h1 class="text-[clamp(2.5rem,6vw,4rem)] font-display font-bold text-white leading-tight text-shadow animate-fade-in" style="animation-delay: 0.1s;" data-i18n="hero.title">
@@ -218,12 +218,12 @@
                 <p class="mt-6 text-[clamp(1rem,2vw,1.25rem)] text-gray-200 max-w-2xl mx-auto animate-fade-in" style="animation-delay: 0.3s;" data-i18n="hero.subtitle">
                     只需输入文字描述，我们的AI就能生成高质量视频，让您的创意轻松变为现实。无需专业技能，人人都能成为视频创作者。
                 </p>
-                
+
                 <!-- 文本输入区域 -->
                 <div class="mt-10 bg-white/10 rounded-2xl p-4 shadow-xl border border-white/10 animate-fade-in" style="animation-delay: 0.5s;">
                     <div class="flex flex-col md:flex-row gap-4">
-                        <textarea 
-                            id="video-prompt" 
+                        <textarea
+                            id="video-prompt"
                             class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                             rows="3"
                             placeholder="描述您想要生成的视频..."
@@ -248,7 +248,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <!-- 生成状态和结果 -->
                     <div id="generation-status" class="mt-4 hidden">
                         <div class="flex items-center justify-center gap-3 py-4">
@@ -256,7 +256,7 @@
                             <p class="text-white" data-i18n="generating">正在生成视频，请稍候...</p>
                         </div>
                     </div>
-                    
+
                     <div id="generation-result" class="mt-4 hidden">
                         <div class="rounded-xl overflow-hidden border border-white/10">
                             <video id="generated-video" controls class="w-full h-auto">
@@ -280,13 +280,13 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- 提示信息 -->
                 <p class="mt-4 text-sm text-gray-400 animate-fade-in" style="animation-delay: 0.7s;" data-i18n="free-prompt">
                     免费用户每天可生成3个视频，注册后可获得更多额度
                 </p>
             </div>
-            
+
             <!-- 滚动提示 -->
             <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/70 animate-bounce">
                 <i class="fa fa-chevron-down"></i>
@@ -303,7 +303,7 @@
                     我们的文生视频平台集成了最先进的AI技术，让视频创作变得前所未有的简单高效
                 </p>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- 功能卡片1 -->
                 <div class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
@@ -315,7 +315,7 @@
                         先进的自然语言处理技术，能够精准理解您的文本描述，捕捉细微的情感和场景细节。
                     </p>
                 </div>
-                
+
                 <!-- 功能卡片2 -->
                 <div class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
                     <div class="w-14 h-14 rounded-xl gradient-overlay flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -326,7 +326,7 @@
                         支持写实、卡通、动漫、抽象等多种艺术风格，满足不同场景和创意需求。
                     </p>
                 </div>
-                
+
                 <!-- 功能卡片3 -->
                 <div class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
                     <div class="w-14 h-14 rounded-xl gradient-overlay flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -337,7 +337,7 @@
                         根据视频内容和情感自动匹配合适的背景音乐，增强视频的表现力和感染力。
                     </p>
                 </div>
-                
+
                 <!-- 功能卡片4 -->
                 <div class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
                     <div class="w-14 h-14 rounded-xl gradient-overlay flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -348,7 +348,7 @@
                         提供简单直观的编辑工具，可调整视频长度、场景转换、语速等参数，实现个性化定制。
                     </p>
                 </div>
-                
+
                 <!-- 功能卡片5 -->
                 <div class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
                     <div class="w-14 h-14 rounded-xl gradient-overlay flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -359,7 +359,7 @@
                         自动保存您的创作到云端，随时随地访问和管理您的视频作品，永不丢失。
                     </p>
                 </div>
-                
+
                 <!-- 功能卡片6 -->
                 <div class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
                     <div class="w-14 h-14 rounded-xl gradient-overlay flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -383,7 +383,7 @@
                     看看其他用户如何通过简单的文字描述，生成令人惊叹的视频作品
                 </p>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- 示例1 -->
                 <div class="video-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
@@ -410,7 +410,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- 示例2 -->
                 <div class="video-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
                     <div class="relative">
@@ -436,7 +436,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- 示例3 -->
                 <div class="video-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
                     <div class="relative">
@@ -463,7 +463,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="mt-12 text-center">
                 <button class="bg-white border border-primary text-primary hover:bg-primary hover:text-white font-medium py-3 px-8 rounded-xl transition-colors flex items-center gap-2 mx-auto">
                     <span data-i18n="examples.more">查看更多示例</span>
@@ -482,7 +482,7 @@
                     无论您是个人爱好者还是企业用户，我们都有满足您需求的方案
                 </p>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
                 <!-- 免费方案 -->
                 <div class="bg-gray-50 rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
@@ -522,7 +522,7 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <!-- 进阶方案 -->
                 <div class="bg-white rounded-2xl overflow-hidden shadow-xl border-2 border-primary relative transform scale-105 z-10">
                     <div class="absolute top-0 right-0 bg-primary text-white text-xs font-bold px-4 py-1" data-i18n="pricing.popular">
@@ -564,7 +564,7 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <!-- 专业方案 -->
                 <div class="bg-gray-50 rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                     <div class="p-6">
@@ -616,7 +616,7 @@
                     关于我们的文生视频平台，您可能想了解这些问题
                 </p>
             </div>
-            
+
             <div class="max-w-3xl mx-auto space-y-4">
                 <!-- FAQ 项目 1 -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -630,7 +630,7 @@
                         </p>
                     </div>
                 </div>
-                
+
                 <!-- FAQ 项目 2 -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                     <button class="faq-toggle w-full flex justify-between items-center p-5 text-left focus:outline-none">
@@ -643,7 +643,7 @@
                         </p>
                     </div>
                 </div>
-                
+
                 <!-- FAQ 项目 3 -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                     <button class="faq-toggle w-full flex justify-between items-center p-5 text-left focus:outline-none">
@@ -656,7 +656,7 @@
                         </p>
                     </div>
                 </div>
-                
+
                 <!-- FAQ 项目 4 -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                     <button class="faq-toggle w-full flex justify-between items-center p-5 text-left focus:outline-none">
@@ -669,7 +669,7 @@
                         </p>
                     </div>
                 </div>
-                
+
                 <!-- FAQ 项目 5 -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                     <button class="faq-toggle w-full flex justify-between items-center p-5 text-left focus:outline-none">
@@ -736,7 +736,7 @@
                         </a>
                     </div>
                 </div>
-                
+
                 <!-- 快速链接 -->
                 <div>
                     <h3 class="text-lg font-bold mb-6" data-i18n="footer.links">快速链接</h3>
@@ -748,7 +748,7 @@
                         <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer.blog">博客</a></li>
                     </ul>
                 </div>
-                
+
                 <!-- 支持 -->
                 <div>
                     <h3 class="text-lg font-bold mb-6" data-i18n="footer.support">支持</h3>
@@ -759,7 +759,7 @@
                         <li><a href="#" class="text-gray-400 hover:text-white transition-colors" data-i18n="footer.tutorials">教程</a></li>
                     </ul>
                 </div>
-                
+
                 <!-- 法律 -->
                 <div>
                     <h3 class="text-lg font-bold mb-6" data-i18n="footer.legal">法律</h3>
@@ -771,7 +771,7 @@
                     </ul>
                 </div>
             </div>
-            
+
             <div class="border-t border-white/10 pt-8">
                 <div class="flex flex-col md:flex-row justify-between items-center">
                     <p class="text-gray-500 text-sm mb-4 md:mb-0" data-i18n="footer.copyright-text">
@@ -789,7 +789,7 @@
 
     <!-- 登录模态框 -->
     <div id="login-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0" id="modal-content">
+        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0" id="login-modal-content">
             <div class="p-6 border-b border-gray-100">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xl font-bold text-dark" data-i18n="login">登录</h3>
@@ -828,7 +828,60 @@
                         </button>
                     </div>
                     <p class="text-center text-sm text-gray-600" data-i18n="no-account">
-                        还没有账号？ <a href="#" class="text-primary hover:text-primary/80 font-medium">注册</a>
+                        还没有账号？ <a href="#" id="modal-register-link" class="text-primary hover:text-primary/80 font-medium">注册</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 注册模态框 -->
+    <div id="register-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden transform transition-all scale-95 opacity-0" id="register-modal-content">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-dark" data-i18n="register">注册</h3>
+                    <button id="close-register-modal" class="text-gray-400 hover:text-gray-500">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <form id="register-form">
+                    <div class="mb-4">
+                        <label for="register-name" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="name">姓名</label>
+                        <input type="text" id="register-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="register-email" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="email">邮箱</label>
+                        <input type="email" id="register-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="register-password" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="password">密码</label>
+                        <input type="password" id="register-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" required minlength="6">
+                    </div>
+                    <div class="mb-6">
+                        <label for="register-confirm-password" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="confirm-password">确认密码</label>
+                        <input type="password" id="register-confirm-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" required minlength="6">
+                    </div>
+                    <button type="submit" class="w-full gradient-overlay hover:opacity-90 text-white font-medium py-3 rounded-xl transition-colors mb-4" data-i18n="register">
+                        注册
+                    </button>
+                    <div class="text-center text-sm text-gray-600 mb-4" data-i18n="or-login-with">
+                        或使用以下方式注册
+                    </div>
+                    <div class="flex space-x-3 mb-6">
+                        <button type="button" class="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 rounded-xl transition-colors">
+                            <i class="fa fa-google"></i>
+                            <span>Google</span>
+                        </button>
+                        <button type="button" class="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 rounded-xl transition-colors">
+                            <i class="fa fa-facebook"></i>
+                            <span>Facebook</span>
+                        </button>
+                    </div>
+                    <p class="text-center text-sm text-gray-600" data-i18n="have-account">
+                        已有账号？ <a href="#" id="modal-login-link" class="text-primary hover:text-primary/80 font-medium">登录</a>
                     </p>
                 </form>
             </div>
@@ -951,11 +1004,14 @@
                     "footer.acceptable-use": "可接受使用政策",
                     "footer.copyright-text": "© 2023 VideoGenius. 保留所有权利。",
                     "footer.cookies": "Cookie 政策",
+                    "name": "姓名",
                     "email": "邮箱",
                     "password": "密码",
+                    "confirm-password": "确认密码",
                     "forgot-password": "忘记密码？",
                     "or-login-with": "或使用以下方式登录",
-                    "no-account": "还没有账号？"
+                    "no-account": "还没有账号？",
+                    "have-account": "已有账号？"
                 },
                 en: {
                     brand: "VideoGenius",
@@ -1067,11 +1123,14 @@
                     "footer.acceptable-use": "Acceptable Use Policy",
                     "footer.copyright-text": "© 2023 VideoGenius. All rights reserved.",
                     "footer.cookies": "Cookie Policy",
+                    "name": "Name",
                     "email": "Email",
                     "password": "Password",
+                    "confirm-password": "Confirm Password",
                     "forgot-password": "Forgot Password?",
                     "or-login-with": "Or log in with",
-                    "no-account": "Don't have an account?"
+                    "no-account": "Don't have an account?",
+                    "have-account": "Already have an account?"
                 },
                 ja: {
                     brand: "VideoGenius",
@@ -1183,142 +1242,201 @@
                     "footer.acceptable-use": "許容使用ポリシー",
                     "footer.copyright-text": "© 2023 VideoGenius. All rights reserved.",
                     "footer.cookies": "クッキーポリシー",
+                    "name": "名前",
                     "email": "メール",
                     "password": "パスワード",
+                    "confirm-password": "パスワード確認",
                     "forgot-password": "パスワードを忘れましたか？",
                     "or-login-with": "または以下でログイン",
-                    "no-account": "アカウントをお持ちでないですか？"
+                    "no-account": "アカウントをお持ちでないですか？",
+                    "have-account": "すでにアカウントをお持ちですか？"
                 }
             };
 
-            // 导航栏滚动效果
-            const navbar = document.getElementById('navbar');
-            window.addEventListener('scroll', function() {
-                if (window.scrollY > 50) {
-                    navbar.classList.add('bg-dark/90', 'backdrop-blur-md', 'shadow-md');
-                    navbar.classList.remove('bg-transparent');
-                } else {
-                    navbar.classList.remove('bg-dark/90', 'backdrop-blur-md', 'shadow-md');
-                    navbar.classList.add('bg-transparent');
-                }
-            });
-            
             // 移动端菜单切换
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
-            
+
             mobileMenuButton.addEventListener('click', function() {
                 mobileMenu.classList.toggle('hidden');
             });
-            
+
             // 用户菜单切换
             const userMenuButton = document.getElementById('user-menu-button');
             const userMenu = document.getElementById('user-menu');
-            
+
             userMenuButton.addEventListener('click', function() {
                 userMenu.classList.toggle('opacity-0');
                 userMenu.classList.toggle('invisible');
             });
-            
+
             // 点击其他地方关闭用户菜单
             document.addEventListener('click', function(event) {
                 if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
                     userMenu.classList.add('opacity-0', 'invisible');
                 }
             });
-            
+
             // FAQ 折叠功能
             const faqToggles = document.querySelectorAll('.faq-toggle');
-            
+
             faqToggles.forEach(toggle => {
                 toggle.addEventListener('click', function() {
                     const content = this.nextElementSibling;
                     const icon = this.querySelector('i');
-                    
+
                     content.classList.toggle('hidden');
                     icon.classList.toggle('rotate-180');
                 });
             });
-            
+
             // 语言切换功能
             const langOptions = document.querySelectorAll('.lang-option');
             const currentLangElement = document.getElementById('current-lang');
-            
+
             langOptions.forEach(option => {
                 option.addEventListener('click', function(e) {
                     e.preventDefault();
                     const lang = this.getAttribute('data-lang');
                     changeLanguage(lang);
-                    
+
                     // 更新当前语言显示
                     currentLangElement.textContent = this.textContent;
                 });
             });
-            
+
             // 生成视频按钮功能
             const generateButton = document.getElementById('generate-button');
             const generationStatus = document.getElementById('generation-status');
             const generationResult = document.getElementById('generation-result');
             const videoPrompt = document.getElementById('video-prompt');
-            
+
             generateButton.addEventListener('click', function() {
                 if (!videoPrompt.value.trim()) {
                     alert('请输入视频描述');
                     return;
                 }
-                
+
                 // 显示生成状态
                 generationStatus.classList.remove('hidden');
                 generationResult.classList.add('hidden');
-                
+
                 // 模拟生成过程
                 setTimeout(function() {
                     generationStatus.classList.add('hidden');
                     generationResult.classList.remove('hidden');
-                    
+
                     // 设置示例视频源
                     document.getElementById('generated-video').src = 'https://storage.googleapis.com/web-dev-assets/video-and-source-tags/chrome.mp4';
                 }, 3000);
             });
-            
-            // 登录模态框功能
+
+            // 登录和注册模态框功能
             const loginLink = document.getElementById('login-link');
+            const registerLink = document.getElementById('register-link');
+            const ctaRegister = document.getElementById('cta-register');
             const loginModal = document.getElementById('login-modal');
+            const registerModal = document.getElementById('register-modal');
             const closeLoginModal = document.getElementById('close-login-modal');
-            const modalContent = document.getElementById('modal-content');
-            
+            const closeRegisterModal = document.getElementById('close-register-modal');
+            const loginModalContent = document.getElementById('login-modal-content');
+            const registerModalContent = document.getElementById('register-modal-content');
+            const modalRegisterLink = document.getElementById('modal-register-link');
+            const modalLoginLink = document.getElementById('modal-login-link');
+
+            // 打开登录模态框
+            function openLoginModal() {
+                closeRegisterModalFunc();
+                loginModal.classList.remove('hidden');
+                loginModal.classList.add('flex');
+                setTimeout(() => {
+                    loginModalContent.classList.remove('scale-95', 'opacity-0');
+                    loginModalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            }
+
+            // 关闭登录模态框
+            function closeLoginModalFunc() {
+                loginModalContent.classList.remove('scale-100', 'opacity-100');
+                loginModalContent.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    loginModal.classList.remove('flex');
+                    loginModal.classList.add('hidden');
+                }, 300);
+            }
+
+            // 打开注册模态框
+            function openRegisterModal() {
+                closeLoginModalFunc();
+                registerModal.classList.remove('hidden');
+                registerModal.classList.add('flex');
+                setTimeout(() => {
+                    registerModalContent.classList.remove('scale-95', 'opacity-0');
+                    registerModalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            }
+
+            // 关闭注册模态框
+            function closeRegisterModalFunc() {
+                registerModalContent.classList.remove('scale-100', 'opacity-100');
+                registerModalContent.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    registerModal.classList.remove('flex');
+                    registerModal.classList.add('hidden');
+                }, 300);
+            }
+
+            // 登录链接点击事件
             if (loginLink) {
                 loginLink.addEventListener('click', function(e) {
                     e.preventDefault();
                     openLoginModal();
                 });
             }
-            
-            // 打开登录模态框
-            function openLoginModal() {
-                loginModal.classList.remove('hidden');
-                loginModal.classList.add('flex');
-                setTimeout(() => {
-                    modalContent.classList.remove('scale-95', 'opacity-0');
-                    modalContent.classList.add('scale-100', 'opacity-100');
-                }, 10);
+
+            // 注册链接点击事件
+            if (registerLink) {
+                registerLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openRegisterModal();
+                });
             }
-            
-            // 关闭登录模态框
-            function closeLoginModalFunc() {
-                modalContent.classList.remove('scale-100', 'opacity-100');
-                modalContent.classList.add('scale-95', 'opacity-0');
-                setTimeout(() => {
-                    loginModal.classList.remove('flex');
-                    loginModal.classList.add('hidden');
-                }, 300);
+
+            // CTA注册按钮点击事件
+            if (ctaRegister) {
+                ctaRegister.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openRegisterModal();
+                });
             }
-            
+
+            // 模态框内的注册链接点击事件
+            if (modalRegisterLink) {
+                modalRegisterLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openRegisterModal();
+                });
+            }
+
+            // 模态框内的登录链接点击事件
+            if (modalLoginLink) {
+                modalLoginLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openLoginModal();
+                });
+            }
+
+            // 关闭登录模态框按钮点击事件
             if (closeLoginModal) {
                 closeLoginModal.addEventListener('click', closeLoginModalFunc);
             }
-            
-            // 点击模态框外部关闭
+
+            // 关闭注册模态框按钮点击事件
+            if (closeRegisterModal) {
+                closeRegisterModal.addEventListener('click', closeRegisterModalFunc);
+            }
+
+            // 点击登录模态框外部关闭
             if (loginModal) {
                 loginModal.addEventListener('click', function(e) {
                     if (e.target === loginModal) {
@@ -1326,7 +1444,16 @@
                     }
                 });
             }
-            
+
+            // 点击注册模态框外部关闭
+            if (registerModal) {
+                registerModal.addEventListener('click', function(e) {
+                    if (e.target === registerModal) {
+                        closeRegisterModalFunc();
+                    }
+                });
+            }
+
             // 登录表单提交
             const loginForm = document.getElementById('login-form');
             if (loginForm) {
@@ -1339,32 +1466,58 @@
                     showLoggedInState();
                 });
             }
-            
+
+            // 注册表单提交
+            const registerForm = document.getElementById('register-form');
+            if (registerForm) {
+                registerForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const password = document.getElementById('register-password');
+                    const confirmPassword = document.getElementById('register-confirm-password');
+
+                    // 验证密码是否一致
+                    if (password.value !== confirmPassword.value) {
+                        alert('两次输入的密码不一致，请重新输入');
+                        return;
+                    }
+
+                    // 模拟注册成功
+                    alert('注册成功！');
+                    closeRegisterModalFunc();
+
+                    // 注册成功后自动登录登录
+                    setTimeout(() => {
+                        showLoggedInState();
+                    }, 500);
+                });
+            }
+
             // 显示登录状态
             function showLoggedInState() {
                 document.getElementById('login-link').classList.add('hidden');
                 document.getElementById('register-link').classList.add('hidden');
                 document.getElementById('user-logged-in').classList.remove('hidden');
             }
-            
+
             // 语言切换函数
             function changeLanguage(lang) {
                 console.log('Changing language to:', lang);
                 console.log('Available translations:', Object.keys(translations));
-                
+
                 if (!translations[lang]) {
                     console.error('No translations available for:', lang);
                     return;
                 }
-                
+
                 // 处理所有带有data-i18n属性的元素
                 const elements = document.querySelectorAll('[data-i18n]');
                 console.log('Found elements with data-i18n:', elements.length);
-                
+
                 elements.forEach(element => {
                     const key = element.getAttribute('data-i18n');
                     console.log('Processing key:', key);
-                    
+
                     if (translations[lang][key]) {
                         // 处理HTML内容（允许包含HTML标签）
                         element.innerHTML = translations[lang][key];
@@ -1372,30 +1525,30 @@
                         console.warn('Missing translation for key:', key, 'in language:', lang);
                     }
                 });
-                
+
                 // 处理所有带有data-i18n-placeholder属性的元素
                 const placeholders = document.querySelectorAll('[data-i18n-placeholder]');
                 console.log('Found elements with data-i18n-placeholder:', placeholders.length);
-                
+
                 placeholders.forEach(element => {
                     const key = element.getAttribute('data-i18n-placeholder');
                     console.log('Processing placeholder key:', key);
-                    
+
                     if (translations[lang][key]) {
                         element.placeholder = translations[lang][key];
                     } else {
                         console.warn('Missing translation for placeholder key:', key, 'in language:', lang);
                     }
                 });
-                
+
                 // 处理select选项
                 const options = document.querySelectorAll('option[data-i18n]');
                 console.log('Found options with data-i18n:', options.length);
-                
+
                 options.forEach(option => {
                     const key = option.getAttribute('data-i18n');
                     console.log('Processing option key:', key);
-                    
+
                     if (translations[lang][key]) {
                         option.textContent = translations[lang][key];
                     } else {
@@ -1407,4 +1560,3 @@
     </script>
 </body>
 </html>
-
