@@ -1,7 +1,7 @@
 import requests
 import json
 
-BASE_URL = 'http://localhost:5005/api'
+BASE_URL = 'http://localhost:5000/api'
 
 
 def test_register():

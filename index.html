@@ -147,7 +147,7 @@
                     <div class="flex items-center space-x-4">
                         <!-- 语言选择器 -->
                         <div class="relative group">
-                            <button class="flex items-center space-x-1 text-white hover:text-primary/80 transition-colors">
+                            <button class="flex items-center space-x-1 text-white hover hover:text-primary/80 transition-colors">
                                 <i class="fa fa-globe"></i>
                                 <span id="current-lang">中文</span>
                                 <i class="fa fa-chevron-down text-xs"></i>
@@ -226,7 +226,7 @@
                             id="video-prompt"
                             class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                             rows="3"
-                            placeholder="描述您想要生成的视频..."
+                            placeholder="描述您您想要生成的视频..."
                             data-i18n-placeholder="prompt.placeholder"
                         ></textarea>
                         <div class="flex flex-col gap-3 w-full md:w-auto">
@@ -242,7 +242,7 @@
                                 <option value="60" data-i18n="durations.60s">60秒</option>
                                 <option value="120" data-i18n="durations.120s">120秒</option>
                             </select>
-                            <button id="generate-button" class="gradient-overlay hover:opacity-90 text-white font-medium py-3 px-6 rounded-xl transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-900 flex items-center justify-center gap-2">
+                            <button id="generate-button" class="gradient-overlay hover:opacity-90 text-white font-medium-medium py-3 px-6 rounded-xl transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-900 flex items-center justify-center gap-2">
                                 <i class="fa fa-magic"></i>
                                 <span data-i18n="generate">生成视频</span>
                             </button>
@@ -350,7 +350,7 @@
                 </div>
 
                 <!-- 功能卡片5 -->
-                <div class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
+                <div class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition transition-shadow border border-gray-100 group">
                     <div class="w-14 h-14 rounded-xl gradient-overlay flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                         <i class="fa fa-cloud-upload text-white text-2xl"></i>
                     </div>
@@ -401,12 +401,12 @@
                     <div class="p-5">
                         <h3 class="font-bold text-dark mb-2" data-i18n="examples.example1.title">山间日落</h3>
                         <p class="text-gray-600 text-sm mb-4" data-i18n="examples.example1.prompt">
-                            提示词: 壮观的日落时分，金色的阳光洒在连绵的山脉和宁静的湖面上，几只飞鸟掠过水面
+                            提示词: 壮观的日落时分，金色的阳光洒在连绵的山脉和宁静的湖面上，几只飞鸟飞鸟掠过水面
                         </p>
                         <div class="flex items-center text-xs text-gray-500">
                             <span class="flex items-center"><i class="fa fa-user-circle mr-1"></i> user873</span>
                             <span class="mx-2">•</span>
-                            <span class="flex items-center"><i class="fa fa-eye mr-1"></i> 1.2k</span>
+                            <span class="flex items-center-center"><i class="fa fa-eye mr-1"></i> 1.2k</span>
                         </div>
                     </div>
                 </div>
@@ -1253,6 +1253,9 @@
                 }
             };
 
+            // API基础URL（使用相对路径）
+            const API_BASE_URL = '/api';
+
             // 移动端菜单切换
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
@@ -1310,6 +1313,8 @@
             const generationStatus = document.getElementById('generation-status');
             const generationResult = document.getElementById('generation-result');
             const videoPrompt = document.getElementById('video-prompt');
+            const videoStyle = document.getElementById('video-style');
+            const videoDuration = document.getElementById('video-duration');
 
             generateButton.addEventListener('click', function() {
                 if (!videoPrompt.value.trim()) {
@@ -1317,18 +1322,31 @@
                     return;
                 }
 
+                // 检查用户是否已登录
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    // 用户未登录，打开登录模态框
+                    openLoginModal();
+                    return;
+                }
+
                 // 显示生成状态
                 generationStatus.classList.remove('hidden');
                 generationResult.classList.add('hidden');
 
-                // 模拟生成过程
-                setTimeout(function() {
-                    generationStatus.classList.add('hidden');
-                    generationResult.classList.remove('hidden');
+                // 调用后端API生成视频
+                generateVideo(token, videoPrompt.value, videoStyle.value, videoDuration.value)
+                    .then(videoUrl => {
+                        generationStatus.classList.add('hidden');
+                        generationResult.classList.remove('hidden');
 
-                    // 设置示例视频源
-                    document.getElementById('generated-video').src = 'https://storage.googleapis.com/web-dev-assets/video-and-source-tags/chrome.mp4';
-                }, 3000);
+                        // 设置生成的视频源
+                        document.getElementById('generated-video').src = videoUrl;
+                    })
+                    .catch(error => {
+                        generationStatus.classList.add('hidden');
+                        alert(`生成视频失败: ${error.message}`);
+                    });
             });
 
             // 登录和注册模态框功能
@@ -1459,11 +1477,29 @@
             if (loginForm) {
                 loginForm.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    // 模拟登录成功
-                    alert('登录成功！');
-                    closeLoginModalFunc();
-                    // 这里应该有实际的登录逻辑
-                    showLoggedInState();
+
+                    const email = document.getElementById('login-email').value;
+                    const password = document.getElementById('login-password').value;
+
+                    // 调用登录API
+                    loginUser(email, password)
+                        .then(response => {
+                            // 保存令牌和用户信息
+                            localStorage.setItem('token', response.token);
+                            localStorage.setItem('user', JSON.stringify(response.user));
+
+                            // 显示成功消息
+                            alert('登录成功！');
+
+                            // 关闭模态框
+                            closeLoginModalFunc();
+
+                            // 更新UI显示登录状态
+                            showLoggedInState();
+                        })
+                        .catch(error => {
+                            alert(`登录失败: ${error.message}`);
+                        });
                 });
             }
 
@@ -1473,23 +1509,51 @@
                 registerForm.addEventListener('submit', function(e) {
                     e.preventDefault();
 
-                    const password = document.getElementById('register-password');
-                    const confirmPassword = document.getElementById('register-confirm-password');
+                    const name = document.getElementById('register-name').value;
+                    const email = document.getElementById('register-email').value;
+                    const password = document.getElementById('register-password').value;
+                    const confirmPassword = document.getElementById('register-confirm-password').value;
 
                     // 验证密码是否一致
-                    if (password.value !== confirmPassword.value) {
+                    if (password !== confirmPassword) {
                         alert('两次输入的密码不一致，请重新输入');
                         return;
                     }
 
-                    // 模拟注册成功
-                    alert('注册成功！');
-                    closeRegisterModalFunc();
+                    // 调用注册API
+                    registerUser(name, email, password)
+                        .then(() => {
+                            // 显示成功消息
+                            alert('注册成功！请登录');
 
-                    // 注册成功后自动登录登录
-                    setTimeout(() => {
-                        showLoggedInState();
-                    }, 500);
+                            // 关闭注册模态框
+                            closeRegisterModalFunc();
+
+                            // 打开登录模态框
+                            setTimeout(() => {
+                                openLoginModal();
+                            }, 500);
+                        })
+                        .catch(error => {
+                            alert(`注册失败: ${error.message}`);
+                        });
+                });
+            }
+
+            // 退出登录
+            const logoutLink = document.getElementById('logout-link');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    // 清除本地存储
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+
+                    // 更新UI显示未登录状态
+                    hideLoggedInState();
+
+                    alert('已成功退出登录');
                 });
             }
 
@@ -1498,6 +1562,13 @@
                 document.getElementById('login-link').classList.add('hidden');
                 document.getElementById('register-link').classList.add('hidden');
                 document.getElementById('user-logged-in').classList.remove('hidden');
+            }
+
+            // 隐藏登录状态
+            function hideLoggedInState() {
+                document.getElementById('login-link').classList.remove('hidden');
+                document.getElementById('register-link').classList.remove('hidden');
+                document.getElementById('user-logged-in').classList.add('hidden');
             }
 
             // 语言切换函数
@@ -1556,6 +1627,138 @@
                     }
                 });
             }
+
+            // API调用函数 - 注册用户
+            async function registerUser(name, email, password) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/register`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            name: name,
+                            email: email,
+                            password: password
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || '注册失败');
+                    }
+
+                    return data;
+                } catch (error) {
+                    console.error('注册错误:', error);
+                    throw error;
+                }
+            }
+
+            // API调用函数 - 用户登录
+            async function loginUser(email, password) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            email: email,
+                            password: password
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || '登录失败');
+                    }
+
+                    return data;
+                } catch (error) {
+                    console.error('登录错误:', error);
+                    throw error;
+                }
+            }
+
+            // API调用函数 - 验证令牌
+            async function verifyToken(token) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/verify-token`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            token: token
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || '令牌无效');
+                    }
+
+                    return data;
+                } catch (error) {
+                    console.error('验证令牌错误:', error);
+                    throw error;
+                }
+            }
+
+            // API调用函数 - 生成视频
+            async function generateVideo(token, prompt, style, duration) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/generate-video`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            token: token,
+                            prompt: prompt,
+                            style: style,
+                            duration: duration
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || '生成视频失败');
+                    }
+
+                    return data.video_url;
+                } catch (error) {
+                    console.error('生成视频错误:', error);
+                    throw error;
+                }
+            }
+
+            // 页面加载时检查用户登录状态
+            function checkLoginStatus() {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    verifyToken(token)
+                        .then(response => {
+                            // 令牌有效，显示登录状态
+                            showLoggedInState();
+                        })
+                        .catch(error => {
+                            // 令牌无效，清除本地存储
+                            console.error('令牌验证失败:', error);
+                            localStorage.removeItem('token');
+                            localStorage.removeItem('user');
+                            hideLoggedInState();
+                        });
+                }
+            }
+
+            // 页面加载完成后检查登录状态
+            checkLoginStatus();
         });
     </script>
 </body>

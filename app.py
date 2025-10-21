@@ -189,10 +189,18 @@ def verify_token():
         return jsonify({'message': '验证令牌失败'}), 500
 
 
+import os
+from flask import send_from_directory
+
 # 主页路由
 @app.route('/')
 def index():
-    return jsonify({'message': 'VideoGenius API 服务正在运行'}), 200
+    return send_from_directory(os.path.join(app.root_path, '.'), 'index.html')
+
+# 静态文件路由
+@app.route('/<path:path>')
+def static_file(path):
+    return send_from_directory(os.path.join(app.root_path, '.'), path)
 
 
 # 初始化数据库
