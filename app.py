@@ -1,83 +1,53 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
 import os
-import pymysql
-from pymysql.cursors import DictCursor
+from functools import wraps
 
+# 导入自定义模块
+from db import db # 数据库模块
+import utils  # 工具函数
+from ai.comfyui_functions import load_prompt_template, submit_comfyui_task  # AI功能模块
+
+# 初始化Flask应用
 app = Flask(__name__)
 CORS(app)
 
 # 配置
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'your-secret-key'
-# app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST') or 'localhost'
-# app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER') or 'root'
-# app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD') or 'ccl123654789*'
-# app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB') or 'videogenius'
+COMFYUI_URL = "http://192.168.2.158:8188/prompt"  # ComfyUI地址
+PROMPT_TEMPLATE_PATH = "video_wan2_2_14B_i2v.json"  # 提示词模板路径
 
 
-# 数据库连接
-MYSQL_HOST = os.environ.get('MYSQL_HOST') or 'localhost'
-MYSQL_USER = os.environ.get('MYSQL_USER') or 'root'
-MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD') or 'ccl123654789*'
-MYSQL_DB = os.environ.get('MYSQL_DB') or 'videogenius'
+# JWT认证装饰器
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        # 从请求头获取token
+        if 'Authorization' in request.headers:
+            auth_header = request.headers['Authorization']
+            token = auth_header.split(" ")[1] if len(auth_header.split(" ")) > 1 else None
 
-def get_db_connection(db_name=MYSQL_DB):
-    return pymysql.connect(
-        host=MYSQL_HOST,
-        user=MYSQL_USER,
-        password=MYSQL_PASSWORD,
-        db=db_name,
-        charset='utf8mb4',
-        cursorclass=DictCursor
-    )
+        if not token:
+            return jsonify({'message': '令牌缺失'}), 401
 
-def init_db():
-    # 连接到 MySQL 服务器（不指定数据库）
-    connection = pymysql.connect(
-        host=MYSQL_HOST,
-        user=MYSQL_USER,
-        password=MYSQL_PASSWORD,
-        charset='utf8mb4',
-        cursorclass=DictCursor
-    )
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute(f"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{MYSQL_DB}'")
-            if not cursor.fetchone():
-                cursor.execute(f"CREATE DATABASE {MYSQL_DB} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
-                print(f"数据库 {MYSQL_DB} 创建成功")
-    finally:
-        connection.close()
+        try:
+            # 解码令牌
+            decoded_data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            current_user = db.get_user_by_id(decoded_data['user_id'])
+            if not current_user:
+                return jsonify({'message': '用户不存在'}), 401
+        except jwt.ExpiredSignatureError:
+            return jsonify({'message': '令牌已过期'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'message': '无效的令牌'}), 401
 
-    # 创建表
-    connection = get_db_connection()
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(100) NOT NULL,
-                email VARCHAR(100) NOT NULL UNIQUE,
-                password VARCHAR(200) NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-            ''')
+        return f(current_user, *args, **kwargs)
 
-            cursor.execute('SELECT * FROM users WHERE email = %s', ('admin@example.com',))
-            if not cursor.fetchone():
-                hashed_password = generate_password_hash('admin123', method='pbkdf2:sha256')
-                cursor.execute('''
-                INSERT INTO users (name, email, password) VALUES (%s, %s, %s)
-                ''', ('管理员', 'admin@example.com', hashed_password))
-
-        connection.commit()
-        print("数据库初始化完成")
-    finally:
-        connection.close()
-
+    return decorated
 
 
 # 注册接口
@@ -89,30 +59,16 @@ def register():
     if not all(key in data for key in ['name', 'email', 'password']):
         return jsonify({'message': '缺少必要的参数'}), 400
 
-    connection = get_db_connection()
-    try:
-        with connection.cursor() as cursor:
-            # 检查邮箱是否已存在
-            cursor.execute('SELECT * FROM users WHERE email = %s', (data['email'],))
-            if cursor.fetchone():
-                return jsonify({'message': '邮箱已被注册'}), 400
+    # 检查邮箱是否已存在
+    if db.get_user_by_email(data['email']):
+        return jsonify({'message': '邮箱已被注册'}), 400
 
-            # 哈希密码
-            hashed_password = generate_password_hash(data['password'], method='pbkdf2:sha256')
-
-            # 创建新用户
-            cursor.execute('''
-            INSERT INTO users (name, email, password) VALUES (%s, %s, %s)
-            ''', (data['name'], data['email'], hashed_password))
-
-        connection.commit()
+    # 哈希密码并创建用户
+    hashed_password = generate_password_hash(data['password'], method='pbkdf2:sha256')
+    if db.create_user(data['name'], data['email'], hashed_password):
         return jsonify({'message': '注册成功'}), 201
-    except Exception as e:
-        print(f'注册时出错: {e}')
-        connection.rollback()
+    else:
         return jsonify({'message': '注册失败'}), 500
-    finally:
-        connection.close()
 
 
 # 登录接口
@@ -124,94 +80,145 @@ def login():
     if not all(key in data for key in ['email', 'password']):
         return jsonify({'message': '缺少必要的参数'}), 400
 
-    connection = get_db_connection()
-    try:
-        with connection.cursor() as cursor:
-            # 查找用户
-            cursor.execute('SELECT * FROM users WHERE email = %s', (data['email'],))
-            user = cursor.fetchone()
+    # 查找用户
+    user = db.get_user_by_email(data['email'])
+    if not user or not check_password_hash(user['password'], data['password']):
+        return jsonify({'message': '邮箱或密码错误'}), 401
 
-            # 检查用户是否存在和密码是否正确
-            if not user or not check_password_hash(user['password'], data['password']):
-                return jsonify({'message': '邮箱或密码错误'}), 401
+    # 生成JWT令牌
+    token = jwt.encode({
+        'user_id': user['id'],
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+    }, app.config['SECRET_KEY'], algorithm='HS256')
 
-            # 生成JWT令牌
-            token = jwt.encode({
-                'user_id': user['id'],
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-            }, app.config['SECRET_KEY'], algorithm='HS256')
-
-            return jsonify({
-                'message': '登录成功',
-                'token': token,
-                'user': {
-                    'id': user['id'],
-                    'name': user['name'],
-                    'email': user['email']
-                }
-            }), 200
-    except Exception as e:
-        print(f'登录时出错: {e}')
-        return jsonify({'message': '登录失败'}), 500
-    finally:
-        connection.close()
+    return jsonify({
+        'message': '登录成功',
+        'token': token,
+        'user': {
+            'id': user['id'],
+            'name': user['name'],
+            'email': user['email']
+        }
+    }), 200
 
 
 # 验证令牌接口
 @app.route('/api/verify-token', methods=['POST'])
 def verify_token():
     data = request.get_json()
-
-    # 验证请求数据
     if 'token' not in data:
         return jsonify({'message': '缺少令牌参数'}), 400
 
     try:
-        # 解码令牌
         decoded_data = jwt.decode(data['token'], app.config['SECRET_KEY'], algorithms=['HS256'])
+        user = db.get_user_by_id(decoded_data['user_id'])
+        if not user:
+            return jsonify({'message': '用户不存在'}), 404
 
-        connection = get_db_connection()
-        try:
-            with connection.cursor() as cursor:
-                # 查找用户
-                cursor.execute('SELECT * FROM users WHERE id = %s', (decoded_data['user_id'],))
-                user = cursor.fetchone()
-
-                if not user:
-                    return jsonify({'message': '用户不存在'}), 404
-
-                return jsonify({
-                    'message': '令牌有效',
-                    'user': {
-                        'id': user['id'],
-                        'name': user['name'],
-                        'email': user['email']
-                    }
-                }), 200
-        except Exception as e:
-            print(f'验证令牌时出错: {e}')
-            return jsonify({'message': '验证令牌失败'}), 500
-        finally:
-            connection.close()
+        return jsonify({
+            'message': '令牌有效',
+            'user': {
+                'id': user['id'],
+                'name': user['name'],
+                'email': user['email']
+            }
+        }), 200
     except jwt.ExpiredSignatureError:
         return jsonify({'message': '令牌已过期'}), 401
     except jwt.InvalidTokenError:
         return jsonify({'message': '无效的令牌'}), 401
     except Exception as e:
-        print(f'验证令牌时出错: {e}')
+        print(f'验证令牌错误: {e}')
         return jsonify({'message': '验证令牌失败'}), 500
 
 
-from flask import render_template
+# 视频生成接口（需要认证）
+@app.route('/api/generate-video', methods=['POST'])
+@token_required
+def generate_video(current_user):
+    """生成视频接口（需要登录）"""
+    data = request.get_json()
+    if not data:
+        return jsonify({'message': '请求格式错误，请使用JSON'}), 400
+
+    # 验证必填参数
+    required_fields = [
+        'image_base64', 'positive_prompt', 'negative_prompt',
+        'width', 'height', 'length', 'fps'
+    ]
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'message': f'缺少必要的参数: {field}'}), 400
+
+    try:
+        # 1. 保存图片（使用用户邮箱生成文件名）
+        save_success, image_path, save_error = utils.save_base64_image(
+            base64_str=data['image_base64'],
+            email=current_user['email']
+        )
+        if not save_success:
+            return jsonify({'message': save_error}), 400
+
+        # 2. 加载提示词模板
+        try:
+            prompt_template = load_prompt_template(PROMPT_TEMPLATE_PATH)
+        except Exception as e:
+            return jsonify({'message': f'加载模板失败: {str(e)}'}), 500
+
+        # 3. 生成文件名前缀
+        safe_email = current_user['email'].replace('@', '_').replace('.', '_')
+        filename_prefix = f"video/{safe_email}_{int(datetime.datetime.now().timestamp())}"
+
+        # 4. 提交任务到ComfyUI
+        success, prompt_id, error = submit_comfyui_task(
+            prompt_template=prompt_template,
+            comfyui_url=COMFYUI_URL,
+            image_path=image_path,
+            positive_prompt=data['positive_prompt'],
+            negative_prompt=data['negative_prompt'],
+            width=int(data['width']),
+            height=int(data['height']),
+            length=int(data['length']),
+            fps=int(data['fps']),
+            filename_prefix=filename_prefix
+        )
+
+        if not success:
+            return jsonify({'message': f'任务提交失败: {error}'}), 500
+
+        # 5. 记录任务到数据库
+        db.add_video_task(
+            user_id=current_user['id'],
+            prompt_id=prompt_id,
+            image_path=image_path,
+            positive_prompt=data['positive_prompt'],
+            negative_prompt=data['negative_prompt'],
+            width=int(data['width']),
+            height=int(data['height']),
+            length=int(data['length']),
+            fps=int(data['fps'])
+        )
+
+        return jsonify({
+            'message': '视频生成任务已提交',
+            'prompt_id': prompt_id
+        }), 200
+
+    except Exception as e:
+        print(f'视频生成接口错误: {str(e)}')
+        return jsonify({'message': '服务器内部错误'}), 500
 
 
+# 首页路由
 @app.route('/')
 def index():
     return render_template('index.html')
 
+
 # 初始化数据库
 with app.app_context():
-    init_db()
+    db.init_db()
+
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port=5000)
