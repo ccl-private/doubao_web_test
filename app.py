@@ -189,18 +189,12 @@ def verify_token():
         return jsonify({'message': '验证令牌失败'}), 500
 
 
-import os
-from flask import send_from_directory
+from flask import render_template
 
-# 主页路由
+
 @app.route('/')
 def index():
-    return send_from_directory(os.path.join(app.root_path, '.'), 'index.html')
-
-# 静态文件路由
-@app.route('/<path:path>')
-def static_file(path):
-    return send_from_directory(os.path.join(app.root_path, '.'), path)
+    return render_template('index.html')
 
 
 # 初始化数据库
