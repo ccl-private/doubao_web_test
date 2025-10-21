@@ -216,40 +216,150 @@
                     文字变视频，<br class="md:hidden">创意无极限
                 </h1>
                 <p class="mt-6 text-[clamp(1rem,2vw,1.25rem)] text-gray-200 max-w-2xl mx-auto animate-fade-in" style="animation-delay: 0.3s;" data-i18n="hero.subtitle">
-                    只需输入文字描述，我们的AI就能生成高质量视频，让您的创意轻松变为现实。无需专业技能，人人都能成为视频创作者。
+                    只需输入文字描述或上传图片，我们的AI就能生成高质量视频，让您的创意轻松变为现实。无需专业技能，人人都能成为视频创作者。
                 </p>
 
-                <!-- 文本输入区域 -->
-                <div class="mt-10 bg-white/10 rounded-2xl p-4 shadow-xl border border-white/10 animate-fade-in" style="animation-delay: 0.5s;">
-                    <div class="flex flex-col md:flex-row gap-4">
-                        <textarea
-                            id="video-prompt"
-                            class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                            rows="3"
-                            placeholder="描述您您想要生成的视频..."
-                            data-i18n-placeholder="prompt.placeholder"
-                        ></textarea>
-                        <div class="flex flex-col gap-3 w-full md:w-auto">
-                            <select id="video-style" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                                <option value="realistic" data-i18n="styles.realistic">写实风格</option>
-                                <option value="cartoon" data-i18n="styles.cartoon">卡通风格</option>
-                                <option value="anime" data-i18n="styles.anime">动漫风格</option>
-                                <option value="abstract" data-i18n="styles.abstract">抽象风格</option>
-                            </select>
-                            <select id="video-duration" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                                <option value="10" data-i18n="durations.10s">10秒</option>
-                                <option value="30" data-i18n="durations.30s">30秒</option>
-                                <option value="60" data-i18n="durations.60s">60秒</option>
-                                <option value="120" data-i18n="durations.120s">120秒</option>
-                            </select>
-                            <button id="generate-button" class="gradient-overlay hover:opacity-90 text-white font-medium-medium py-3 px-6 rounded-xl transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-900 flex items-center justify-center gap-2">
-                                <i class="fa fa-magic"></i>
-                                <span data-i18n="generate">生成视频</span>
-                            </button>
+                <!-- 视频生成方式Tab切换 -->
+                <div class="mt-10 animate-fade-in" style="animation-delay: 0.5s;">
+                    <!-- Tab导航 -->
+                    <div class="flex bg-white/10 rounded-t-2xl overflow-hidden border-b border-white/10">
+                        <button id="text-to-video-tab" class="flex-1 py-4 px-6 text-white font-medium transition-colors bg-primary/30 border-b-2 border-primary" data-i18n="tabs.text-to-video">
+                            文字生视频
+                        </button>
+                        <button id="image-to-video-tab" class="flex-1 py-4 px-6 text-white/80 font-medium transition-colors hover:bg-white/5" data-i18n="tabs.image-to-video">
+                            图片生视频
+                        </button>
+                    </div>
+
+                    <!-- 文字生视频内容 -->
+                    <div id="text-to-video-content" class="bg-white/10 rounded-b-2xl p-4 shadow-xl border-x border-b border-white/10">
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <textarea
+                                id="video-prompt"
+                                class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                                rows="3"
+                                placeholder="描述您想要生成的视频..."
+                                data-i18n-placeholder="prompt.placeholder"
+                            ></textarea>
+                            <div class="flex flex-col gap-3 w-full md:w-auto">
+                                <select id="video-style" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <option value="realistic" data-i18n="styles.realistic">写实风格</option>
+                                    <option value="cartoon" data-i18n="styles.cartoon">卡通风格</option>
+                                    <option value="anime" data-i18n="styles.anime">动漫风格</option>
+                                    <option value="abstract" data-i18n="styles.abstract">抽象风格</option>
+                                </select>
+                                <select id="video-duration" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <option value="10" data-i18n="durations.10s">10秒</option>
+                                    <option value="30" data-i18n="durations.30s">30秒</option>
+                                    <option value="60" data-i18n="durations.60s">60秒</option>
+                                    <option value="120" data-i18n="durations.120s">120秒</option>
+                                </select>
+                                <button id="generate-button" class="gradient-overlay hover:opacity-90 text-white font-medium-medium py-3 px-6 rounded-xl transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-900 flex items-center justify-center gap-2">
+                                    <i class="fa fa-magic"></i>
+                                    <span data-i18n="generate">生成视频</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- 生成状态和结果 -->
+                    <!-- 图片生视频内容 (新增) -->
+                    <div id="image-to-video-content" class="bg-white/10 rounded-b-2xl p-4 shadow-xl border-x border-b border-white/10 hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- 左侧：图片上传区域 -->
+                            <div class="md:col-span-1">
+                                <div class="bg-white/5 border-2 border-dashed border-white/20 rounded-xl p-4 h-full flex flex-col items-center justify-center hover:border-primary transition-colors cursor-pointer" id="image-upload-area">
+                                    <input type="file" id="image-upload" accept="image/*" class="hidden">
+                                    <i class="fa fa-cloud-upload text-4xl text-white/60 mb-3"></i>
+                                    <p class="text-center text-white/80 text-sm" data-i18n="upload-image-prompt">
+                                        点击上传图片<br>或拖放至此
+                                    </p>
+                                    <div id="uploaded-image-preview" class="mt-4 w-full hidden">
+                                        <img src="" alt="预览图" class="w-full h-auto rounded-lg">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 右侧：参数设置区域 -->
+                            <div class="md:col-span-2 space-y-3">
+                                <!-- 正面提示词 -->
+                                <div>
+                                    <label class="block text-white/80 text-sm mb-1" data-i18n="positive-prompt">正面提示词</label>
+                                    <textarea
+                                        id="positive-prompt"
+                                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                                        rows="2"
+                                        placeholder="描述视频的风格、动作、氛围等..."
+                                    ></textarea>
+                                </div>
+
+                                <!-- 负面提示词 -->
+                                <div>
+                                    <label class="block text-white/80 text-sm mb-1" data-i18n="negative-prompt">负面提示词</label>
+                                    <textarea
+                                        id="negative-prompt"
+                                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                                        rows="2"
+                                        placeholder="描述不希望在视频中出现的内容..."
+                                    ></textarea>
+                                </div>
+
+                                <!-- 视频参数 (网格布局) -->
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    <!-- 宽度 -->
+                                    <div>
+                                        <label class="block text-white/80 text-sm mb-1" data-i18n="width">宽度</label>
+                                        <select id="video-width" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <option value="512">512px</option>
+                                            <option value="640" selected>640px</option>
+                                            <option value="768">768px</option>
+                                            <option value="1024">1024px</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- 高度 -->
+                                    <div>
+                                        <label class="block text-white/80 text-sm mb-1" data-i18n="height">高度</label>
+                                        <select id="video-height" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <option value="512">512px</option>
+                                            <option value="640" selected>640px</option>
+                                            <option value="768">768px</option>
+                                            <option value="1024">1024px</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- 帧率 -->
+                                    <div>
+                                        <label class="block text-white/80 text-sm mb-1" data-i18n="fps">帧率</label>
+                                        <select id="video-fps" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <option value="12">12 FPS</option>
+                                            <option value="16" selected>16 FPS</option>
+                                            <option value="24">24 FPS</option>
+                                            <option value="30">30 FPS</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- 长度(秒) -->
+                                    <div>
+                                        <label class="block text-white/80 text-sm mb-1" data-i18n="duration">时长(秒)</label>
+                                        <select id="video-length" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <option value="20">~2秒</option>
+                                            <option value="40">~4秒</option>
+                                            <option value="80" selected>~8秒</option>
+                                            <option value="160">~16秒</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- 生成按钮 -->
+                                <button id="image-generate-button" class="w-full gradient-overlay hover:opacity-90 text-white font-medium-medium py-3 px-6 rounded-xl transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-900 flex items-center justify-center gap-2">
+                                    <i class="fa fa-magic"></i>
+                                    <span data-i18n="generate-from-image">从图片生成视频</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 生成状态和结果 (共用区域) -->
                     <div id="generation-status" class="mt-4 hidden">
                         <div class="flex items-center justify-center gap-3 py-4">
                             <div class="w-8 h-8 border-4 border-white/20 rounded-full loader"></div>
@@ -292,6 +402,116 @@
                 <i class="fa fa-chevron-down"></i>
             </div>
         </div>
+        <script>
+        // Tab切换逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取元素
+            const textTab = document.getElementById('text-to-video-tab');
+            const imageTab = document.getElementById('image-to-video-tab');
+            const textContent = document.getElementById('text-to-video-content');
+            const imageContent = document.getElementById('image-to-video-content');
+            const imageUploadArea = document.getElementById('image-upload-area');
+            const imageUpload = document.getElementById('image-upload');
+            const imagePreview = document.getElementById('uploaded-image-preview');
+
+            // Tab切换事件
+            textTab.addEventListener('click', function() {
+                textTab.classList.add('bg-primary/30', 'border-b-2', 'border-primary', 'text-white');
+                textTab.classList.remove('text-white/80', 'hover:bg-white/5');
+                imageTab.classList.remove('bg-primary/30', 'border-b-2', 'border-primary', 'text-white');
+                imageTab.classList.add('text-white/80', 'hover:bg-white/5');
+                textContent.classList.remove('hidden');
+                imageContent.classList.add('hidden');
+            });
+
+            imageTab.addEventListener('click', function() {
+                imageTab.classList.add('bg-primary/30', 'border-b-2', 'border-primary', 'text-white');
+                imageTab.classList.remove('text-white/80', 'hover:bg-white/5');
+                textTab.classList.remove('bg-primary/30', 'border-b-2', 'border-primary', 'text-white');
+                textTab.classList.add('text-white/80', 'hover:bg-white/5');
+                imageContent.classList.remove('hidden');
+                textContent.classList.add('hidden');
+            });
+
+            // 图片上传区域点击触发文件选择
+            imageUploadArea.addEventListener('click', function() {
+                imageUpload.click();
+            });
+
+            // 图片预览功能
+            imageUpload.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.innerHTML = `<img src="${e.target.result}" alt="预览图" class="w-full h-auto rounded-lg">`;
+                        imagePreview.classList.remove('hidden');
+                    }
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+
+            // 拖放功能
+            imageUploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                imageUploadArea.classList.add('border-primary');
+            });
+
+            imageUploadArea.addEventListener('dragleave', function() {
+                imageUploadArea.classList.remove('border-primary');
+            });
+
+            imageUploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                imageUploadArea.classList.remove('border-primary');
+
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    // 将拖放的文件赋值给file input
+                    imageUpload.files = e.dataTransfer.files;
+
+                    // 预览图片
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.innerHTML = `<img src="${e.target.result}" alt="预览图" class="w-full h-auto rounded-lg">`;
+                        imagePreview.classList.remove('hidden');
+                    }
+                    reader.readAsDataURL(e.dataTransfer.files[0]);
+                }
+            });
+
+            // 生成按钮点击事件（图片生视频）
+            document.getElementById('image-generate-button').addEventListener('click', function() {
+                // 简单验证
+                if (!imageUpload.files || imageUpload.files.length === 0) {
+                    alert('请先上传图片');
+                    return;
+                }
+
+                // 显示生成状态
+                document.getElementById('generation-status').classList.remove('hidden');
+                document.getElementById('generation-result').classList.add('hidden');
+
+                // 这里可以添加实际的API调用逻辑
+                // 收集参数示例：
+                const formData = new FormData();
+                formData.append('image', imageUpload.files[0]);
+                formData.append('positive_prompt', document.getElementById('positive-prompt').value);
+                formData.append('negative_prompt', document.getElementById('negative-prompt').value);
+                formData.append('width', document.getElementById('video-width').value);
+                formData.append('height', document.getElementById('video-height').value);
+                formData.append('fps', document.getElementById('video-fps').value);
+                formData.append('length', document.getElementById('video-length').value);
+
+                // 模拟生成过程
+                setTimeout(() => {
+                    document.getElementById('generation-status').classList.add('hidden');
+                    document.getElementById('generation-result').classList.remove('hidden');
+                    // 实际项目中这里会设置真实的视频URL
+                    document.querySelector('#generated-video source').src = 'sample-video.mp4';
+                    document.getElementById('generated-video').load();
+                }, 3000);
+            });
+        });
+        </script>
     </section>
 
     <!-- 功能特点 -->

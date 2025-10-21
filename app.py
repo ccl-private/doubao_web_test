@@ -12,31 +12,50 @@ CORS(app)
 
 # 配置
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'your-secret-key'
-app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST') or 'localhost'
-app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER') or 'root'
-app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD') or 'ccl123654789*'
-app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB') or 'videogenius'
+# app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST') or 'localhost'
+# app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER') or 'root'
+# app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD') or 'ccl123654789*'
+# app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB') or 'videogenius'
 
 
 # 数据库连接
-def get_db_connection():
-    connection = pymysql.connect(
-        host=app.config['MYSQL_HOST'],
-        user=app.config['MYSQL_USER'],
-        password=app.config['MYSQL_PASSWORD'],
-        db=app.config['MYSQL_DB'],
+MYSQL_HOST = os.environ.get('MYSQL_HOST') or 'localhost'
+MYSQL_USER = os.environ.get('MYSQL_USER') or 'root'
+MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD') or 'ccl123654789*'
+MYSQL_DB = os.environ.get('MYSQL_DB') or 'videogenius'
+
+def get_db_connection(db_name=MYSQL_DB):
+    return pymysql.connect(
+        host=MYSQL_HOST,
+        user=MYSQL_USER,
+        password=MYSQL_PASSWORD,
+        db=db_name,
         charset='utf8mb4',
         cursorclass=DictCursor
     )
-    return connection
 
-
-# 创建数据库表
 def init_db():
+    # 连接到 MySQL 服务器（不指定数据库）
+    connection = pymysql.connect(
+        host=MYSQL_HOST,
+        user=MYSQL_USER,
+        password=MYSQL_PASSWORD,
+        charset='utf8mb4',
+        cursorclass=DictCursor
+    )
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(f"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{MYSQL_DB}'")
+            if not cursor.fetchone():
+                cursor.execute(f"CREATE DATABASE {MYSQL_DB} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
+                print(f"数据库 {MYSQL_DB} 创建成功")
+    finally:
+        connection.close()
+
+    # 创建表
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
-            # 创建用户表
             cursor.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -47,24 +66,18 @@ def init_db():
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
             ''')
 
-            # 检查是否已经有管理员用户
             cursor.execute('SELECT * FROM users WHERE email = %s', ('admin@example.com',))
-            admin = cursor.fetchone()
-
-            if not admin:
-                # 创建管理员用户
+            if not cursor.fetchone():
                 hashed_password = generate_password_hash('admin123', method='pbkdf2:sha256')
                 cursor.execute('''
                 INSERT INTO users (name, email, password) VALUES (%s, %s, %s)
                 ''', ('管理员', 'admin@example.com', hashed_password))
 
         connection.commit()
-        print('数据库初始化完成')
-    except Exception as e:
-        print(f'初始化数据库时出错: {e}')
-        connection.rollback()
+        print("数据库初始化完成")
     finally:
         connection.close()
+
 
 
 # 注册接口
@@ -195,7 +208,6 @@ from flask import render_template
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 # 初始化数据库
 with app.app_context():
