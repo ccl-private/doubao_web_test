@@ -123,32 +123,61 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
     <!-- 导航栏 -->
-    {% include 'components/header.html' %}
+    <div id="header-container"></div>
 
     <!-- 英雄区域 -->
-    {% include 'components/hero.html' %}
+    <div id="hero-container"></div>
 
     <!-- 功能特点 -->
-    {% include 'components/features.html' %}
+    <div id="features-container"></div>
 
     <!-- 示例展示 -->
-    {% include 'components/examples.html' %}
+    <div id="examples-container"></div>
 
     <!-- 价格方案 -->
-    {% include 'components/pricing.html' %}
+    <div id="pricing-container"></div>
 
     <!-- 常见问题 -->
-    {% include 'components/faq.html' %}
+    <div id="faq-container"></div>
 
     <!-- 行动召唤 -->
-    {% include 'components/cta.html' %}
+    <div id="cta-container"></div>
 
     <!-- 页脚 -->
-    {% include 'components/footer.html' %}
+    <div id="footer-container"></div>
 
     <!-- 模态框 -->
-    {% include 'components/modals.html' %}
+    <div id="modals-container"></div>
 
-    <script src="/static/js/main.js" type="module"></script>
+    <script>
+        // 动态加载组件
+        async function loadComponents() {
+            const components = [
+                { id: 'header-container', path: 'components/header.html' },
+                { id: 'hero-container', path: 'components/hero.html' },
+                { id: 'features-container', path: 'components/features.html' },
+                { id: 'examples-container', path: 'components/examples.html' },
+                { id: 'pricing-container', path: 'components/pricing.html' },
+                { id: 'faq-container', path: 'components/faq.html' },
+                { id: 'cta-container', path: 'components/cta.html' },
+                { id: 'footer-container', path: 'components/footer.html' },
+                { id: 'modals-container', path: 'components/modals.html' }
+            ];
+
+            for (const component of components) {
+                const response = await fetch(component.path);
+                const html = await response.text();
+                document.getElementById(component.id).innerHTML = html;
+            }
+
+            // 加载完成后初始化主脚本
+            const script = document.createElement('script');
+            script.src = '/static/js/main.js';
+            document.body.appendChild(script);
+        }
+
+        // 页面加载时加载组件
+        window.addEventListener('DOMContentLoaded', loadComponents);
+    </script>
 </body>
 </html>

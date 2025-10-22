@@ -1,0 +1,75 @@
+<header id="navbar" class="fixed w-full top-0 z-50 bg-dark/90 backdrop-blur-md shadow-md">
+    <div class="border-b border-white/10">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <a href="#" class="flex items-center space-x-2">
+                    <div class="w-10 h-10 rounded-lg gradient-overlay flex items-center justify-center">
+                        <i class="fa fa-play-circle text-white text-xl"></i>
+                    </div>
+                    <span class="text-xl font-display font-bold text-white" data-i18n="brand">VideoGenius</span>
+                </a>
+
+                <!-- 导航链接 - 桌面版 -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-white hover:text-primary/80 transition-colors" data-i18n="features">功能</a>
+                    <a href="#examples" class="text-white hover:text-primary/80 transition-colors" data-i18n="examples">示例</a>
+                    <a href="#pricing" class="text-white hover:text-primary/80 transition-colors" data-i18n="pricing">价格</a>
+                    <a href="#faq" class="text-white hover:text-primary/80 transition-colors" data-i18n="faq">常见问题</a>
+                </nav>
+
+                <!-- 右侧操作区 -->
+                <div class="flex items-center space-x-4">
+                    <!-- 语言选择器 -->
+                    <div class="relative group">
+                        <button class="flex items-center space-x-1 text-white hover hover:text-primary/80 transition-colors">
+                            <i class="fa fa-globe"></i>
+                            <span id="current-lang">中文</span>
+                            <i class="fa fa-chevron-down text-xs"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-36 rounded-md shadow-lg bg-dark/90 backdrop-blur-md border border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <div class="py-1">
+                                <a href="#" class="lang-option block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-lang="zh">中文</a>
+                                <a href="#" class="lang-option block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-lang="en">English</a>
+                                <a href="#" class="lang-option block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-lang="ja">日本語</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 用户菜单 -->
+                    <div class="relative group">
+                        <button id="user-menu-button" class="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+                            <i class="fa fa-user text-white"></i>
+                        </button>
+                        <div id="user-menu" class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-dark/90 backdrop-blur-md border border-white/10 opacity-0 invisible transition-all duration-200 z-50">
+                            <div class="py-1">
+                                <a href="#" id="login-link" class="block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-i18n="login">登录</a>
+                                <a href="#" id="register-link" class="block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-i18n="register">注册</a>
+                                <div id="user-logged-in" class="hidden">
+                                    <a href="#" class="block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-i18n="profile">个人资料</a>
+                                    <a href="#" class="block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-i18n="my-videos">我的视频</a>
+                                    <a href="#" id="logout-link" class="block px-4 py-2 text-sm text-white hover:bg-primary/20 transition-colors" data-i18n="logout">退出</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 移动端菜单按钮 -->
+                    <button id="mobile-menu-button" class="md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+                        <i class="fa fa-bars text-white"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 移动端菜单 -->
+    <div id="mobile-menu" class="md:hidden bg-dark/90 backdrop-blur-md border-b border-white/10 hidden">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <a href="#features" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-primary/20 transition-colors" data-i18n="features">功能</a>
+            <a href="#examples" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-primary/20 transition-colors" data-i18n="examples">示例</a>
+            <a href="#pricing" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-primary/20 transition-colors" data-i18n="pricing">价格</a>
+            <a href="#faq" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-primary/20 transition-colors" data-i18n="faq">常见问题</a>
+        </div>
+    </div>
+</header>
