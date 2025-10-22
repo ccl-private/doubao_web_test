@@ -27,6 +27,7 @@ PROMPT_TEMPLATE_PATH = "ai/video_wan2_2_14B_i2v.json"  # 提示词模板路径
 # 创建上传目录（如果不存在）
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
+# 如果localtest = True，说明本后端服务和COMFYUI服务不在同一台服务器，也没有共享目录，目录是nfs的，两台机器同一文件夹目录不太一致
 localtest = True
 if localtest:
     app.config['UPLOAD_FOLDER'] = '/mnt/mnt158_hdd/ccl/temp_images'  # 图片上传目录
