@@ -9,6 +9,10 @@ export function initTextVideoGenerator() {
     const videoPrompt = document.getElementById('video-prompt');
     const videoStyle = document.getElementById('video-style');
     const videoDuration = document.getElementById('video-duration');
+    // 新增：获取宽度、高度、fps的DOM元素（假设你的HTML中有这些控件）
+    const videoWidth = document.getElementById('video-width');
+    const videoHeight = document.getElementById('video-height');
+    const videoFps = document.getElementById('video-fps');
 
     if (generateButton) {
         generateButton.addEventListener('click', async function() {
@@ -20,7 +24,6 @@ export function initTextVideoGenerator() {
             // 检查用户是否已登录
             const token = localStorage.getItem('token');
             if (!token) {
-                // 用户未登录，打开登录模态框
                 openLoginModal();
                 return;
             }
@@ -30,20 +33,23 @@ export function initTextVideoGenerator() {
             generationResult.classList.add('hidden');
 
             try {
-                // 调用后端API生成视频
-                const videoUrl = await generateVideoByText(
-                    token,
-                    videoPrompt.value,
-                    videoStyle.value,
-                    videoDuration.value
-                );
+                // 构建参数对象（包含所有必要参数）
+                const params = {
+                    prompt: videoPrompt.value,
+                    style: videoStyle.value,
+                    duration: videoDuration.value,
+                    width: videoWidth.value,
+                    height: videoHeight.value,
+                    fps: videoFps.value
+                };
+
+                // 调用后端API生成视频（传递token和params）
+                const result = await generateVideoByText(token, params);
 
                 // 隐藏状态，显示结果
                 generationStatus.classList.add('hidden');
                 generationResult.classList.remove('hidden');
-
-                // 设置生成的视频源
-                document.getElementById('generated-video').src = videoUrl;
+                alert(`视频生成任务已提交，任务ID：${result.promptId}，消耗积分：${result.pointsConsumed}`);
             } catch (error) {
                 generationStatus.classList.add('hidden');
                 alert(`生成视频失败: ${error.message}`);
@@ -133,25 +139,27 @@ export function initImageVideoGenerator() {
             generationResult.classList.add('hidden');
 
             try {
-                // 收集参数
-                const formData = new FormData();
-                formData.append('image', imageUpload.files[0]);
-                formData.append('positive_prompt', document.getElementById('positive-prompt').value);
-                formData.append('negative_prompt', document.getElementById('negative-prompt').value);
-                formData.append('width', document.getElementById('video-width').value);
-                formData.append('height', document.getElementById('video-height').value);
-                formData.append('fps', document.getElementById('video-fps').value);
-                formData.append('length', document.getElementById('video-length').value);
-                formData.append('token', token);
+                // 1. 收集参数（构建params对象，而非直接构建formData）
+                const params = {
+                    positivePrompt: document.getElementById('positive-prompt').value,
+                    negativePrompt: document.getElementById('negative-prompt').value,
+                    width: document.getElementById('video-width').value,
+                    height: document.getElementById('video-height').value,
+                    fps: document.getElementById('video-fps').value,
+                    length: document.getElementById('video-length').value
+                };
 
-                // 调用API生成视频
-                const videoUrl = await generateVideoByImage(formData);
+                // 2. 获取图片文件
+                const imageFile = imageUpload.files[0];
 
-                // 显示结果
+                // 3. 调用API生成视频（按api.js要求传递参数：token, imageFile, params）
+                const result = await generateVideoByImage(token, imageFile, params);
+
+                // 4. 显示结果（注意：后端返回的是任务ID，不是直接的videoUrl）
                 generationStatus.classList.add('hidden');
                 generationResult.classList.remove('hidden');
-                document.getElementById('generated-video').src = videoUrl;
-                document.getElementById('generated-video').load();
+                alert(`视频生成任务已提交，任务ID：${result.promptId}，消耗积分：${result.pointsConsumed}`);
+                // 若后续需要展示视频，需根据promptId轮询后端结果
             } catch (error) {
                 generationStatus.classList.add('hidden');
                 alert(`生成视频失败: ${error.message}`);
